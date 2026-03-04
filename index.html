@@ -396,16 +396,32 @@ const DEFAULT_PROGRAM=[
   {label:"Chest/Back B",exercises:["Flat DB Bench Press","Ring Pull-ups","Incline DB Bench Press","Ring Rows","DB Step-Ups"]}
 ];
 const loadProgram=()=>{
+  const toExerciseObj=e=>{
+    const name=typeof e==='string'?e:(e&&typeof e.name==='string'?e.name:'');
+    const lib=EXERCISES.find(x=>x.name===name)||{};
+    return {
+      name,
+      sets:typeof e==='object'&&e&&Number.isFinite(e.sets)?e.sets:(lib.sets||3),
+      reps:typeof e==='object'&&e&&Number.isFinite(e.reps)?e.reps:(lib.reps||8)
+    };
+  };
+  const normalizeDays=days=>(Array.isArray(days)?days:[]).map(d=>({
+    label:d?.label||'',
+    exercises:(Array.isArray(d?.exercises)?d.exercises:[]).map(toExerciseObj).filter(ex=>ex.name)
+  }));
   try{
     const saved=JSON.parse(localStorage.getItem('lift_program_v2'));
-    if(saved)return saved;
+    if(saved){
+      const normalized=normalizeDays(saved);
+      saveProgram(normalized);
+      return normalized;
+    }
     // Migrate from v1 (string arrays) or use defaults
     const v1=JSON.parse(localStorage.getItem('lift_program_v1'));
     if(v1){
-      return v1.map(d=>({
-        label:d.label,
-        exercises:d.exercises.map(e=>typeof e==='string'?{name:e,sets:3,reps:8}:e)
-      }));
+      const normalized=normalizeDays(v1);
+      saveProgram(normalized);
+      return normalized;
     }
     return DEFAULT_PROGRAM.map(d=>({label:d.label,exercises:d.exercises.map(name=>({name,sets:3,reps:8}))}));
   }catch{
@@ -419,7 +435,26 @@ const loadLog=()=>{try{return JSON.parse(localStorage.getItem('lift_log_v1')||'[
 const saveLog=l=>localStorage.setItem('lift_log_v1',JSON.stringify(l));
 const loadPRs=()=>{try{return JSON.parse(localStorage.getItem('lift_pr_v1')||'{}')}catch{return{}}};
 const savePRs=p=>localStorage.setItem('lift_pr_v1',JSON.stringify(p));
-const loadCustomPrograms=()=>{try{return JSON.parse(localStorage.getItem('lift_custom_programs_v1')||'[]')}catch{return[]}};
+const loadCustomPrograms=()=>{
+  const toExerciseObj=e=>{
+    const name=typeof e==='string'?e:(e&&typeof e.name==='string'?e.name:'');
+    const lib=EXERCISES.find(x=>x.name===name)||{};
+    return {
+      name,
+      sets:typeof e==='object'&&e&&Number.isFinite(e.sets)?e.sets:(lib.sets||3),
+      reps:typeof e==='object'&&e&&Number.isFinite(e.reps)?e.reps:(lib.reps||8)
+    };
+  };
+  try{
+    const raw=JSON.parse(localStorage.getItem('lift_custom_programs_v1')||'[]');
+    const normalized=(Array.isArray(raw)?raw:[]).map(p=>({
+      name:p?.name||'',
+      exercises:(Array.isArray(p?.exercises)?p.exercises:[]).map(toExerciseObj).filter(ex=>ex.name)
+    }));
+    saveCustomPrograms(normalized);
+    return normalized;
+  }catch{return[]}
+};
 const saveCustomPrograms=p=>localStorage.setItem('lift_custom_programs_v1',JSON.stringify(p));
 let wlog=loadLog(),prs=loadPRs(),customPrograms=loadCustomPrograms();
 let currentDay=null,activeIdx=0,wsets=[],currentCustomProgram=null;
@@ -644,7 +679,7 @@ function renderEditList(){
   const day=PROGRAM[editingDayIdx];
   document.getElementById('edit-ex-list').innerHTML=day.exercises.map((ex,i)=>`
     <div class="edit-ex-row">
-      <div class="edit-ex-name">${ex}</div>
+      <div class="edit-ex-name">${ex.name}</div>
       <button class="edit-btn" onclick="moveEx(${i},-1)" ${i===0?'disabled style="opacity:0.3"':''}>&#9650;</button>
       <button class="edit-btn" onclick="moveEx(${i},1)" ${i===day.exercises.length-1?'disabled style="opacity:0.3"':''}>&#9660;</button>
       <button class="edit-btn danger" onclick="removeEx(${i})">&#10005;</button>
@@ -672,7 +707,7 @@ function showAddExercise(){
 
 function renderAddList(){
   const current=PROGRAM[editingDayIdx].exercises;
-  const available=EXERCISES.filter(e=>!current.includes(e.name));
+  const available=EXERCISES.filter(e=>!current.some(ex=>ex.name===e.name));
   document.getElementById('add-ex-list').innerHTML=available.length?available.map(ex=>`
     <div class="add-ex-item">
       <span class="add-ex-name">${ex.name}</span>
@@ -681,7 +716,8 @@ function renderAddList(){
 }
 
 function addExToDay(name){
-  PROGRAM[editingDayIdx].exercises.push(name);
+  const lib=getEx(name);
+  PROGRAM[editingDayIdx].exercises.push({name,sets:lib.sets||3,reps:lib.reps||8});
   renderEditList();
   renderAddList();
 }
@@ -750,10 +786,13 @@ function editDefaultProgram(idx){
   editingProgramIdx=idx;
   editingDefaultProgram=true;
   const prog=PROGRAM[idx];
-  // Convert string array to objects with sets/reps from exercise library
-  programExercises=prog.exercises.map(name=>{
-    const ex=getEx(name);
-    return {name, sets:ex.sets||3, reps:ex.reps||8};
+  programExercises=prog.exercises.map(ex=>{
+    const lib=getEx(ex.name);
+    return {
+      name:ex.name,
+      sets:Number.isFinite(ex.sets)?ex.sets:(lib.sets||3),
+      reps:Number.isFinite(ex.reps)?ex.reps:(lib.reps||8)
+    };
   });
   document.getElementById('program-name-input').value=prog.label;
   document.getElementById('create-program-header').textContent='Edit Program';
