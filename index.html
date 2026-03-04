@@ -388,13 +388,18 @@ const DEFAULT_EXERCISES=[
 const loadExercises=()=>{try{return JSON.parse(localStorage.getItem('lift_exercises_v1'))||DEFAULT_EXERCISES.map(e=>({...e}))}catch{return DEFAULT_EXERCISES.map(e=>({...e}))}};
 const saveExercises=e=>localStorage.setItem('lift_exercises_v1',JSON.stringify(e));
 let EXERCISES=loadExercises();
-const DEFAULT_PROGRAM=[
-  {label:"Shoulder/Arms A",exercises:["DB Overhead Press","DB Lateral Raise","EZ Bar Curl","EZ Bar Skull Crushers","Ring Face Pull"]},
-  {label:"Chest/Back A",exercises:["Incline DB Bench Press","Pull-ups (Bar)","Flat DB Bench Press","One-Arm DB Row","Ring Rows"]},
-  {label:"Legs",exercises:["DB RDL","Goblet Squat","Bulgarian Split Squat","Hanging Leg Raise (Bar)","Core (Plank / Ring Fallout)"]},
-  {label:"Shoulder/Arms B",exercises:["DB Overhead Press","DB Rear Delt Raise","DB Hammer Curl","Close-Grip Push-ups","Ring Dips"]},
-  {label:"Chest/Back B",exercises:["Flat DB Bench Press","Ring Pull-ups","Incline DB Bench Press","Ring Rows","DB Step-Ups"]}
+const DEFAULT_PROGRAM_HOME=[
+  {label:"Day A: Shoulders + Chest/Triceps",exercises:["DB Overhead Press","DB Lateral Raise","Incline DB Bench Press","Flat DB Bench Press","EZ Bar Skull Crushers","Ring Dips"]},
+  {label:"Day B: Shoulders + Back/Biceps",exercises:["DB Overhead Press","DB Rear Delt Raise","Pull-ups (Bar)","One-Arm DB Row","Ring Rows","EZ Bar Curl","DB Hammer Curl"]},
+  {label:"Day C: Shoulders + Legs/Core",exercises:["DB Overhead Press","DB Lateral Raise","DB RDL","Goblet Squat","Bulgarian Split Squat","Hanging Leg Raise (Bar)","Core (Plank / Ring Fallout)"]}
 ];
+const DEFAULT_PROGRAM_GYM=[
+  {label:"Day A: Shoulders + Chest/Triceps",exercises:["Barbell Overhead Press","Cable Lateral Raise","Incline Barbell Bench Press","Barbell Bench Press","Cable Triceps Pushdown","Machine Chest Fly"]},
+  {label:"Day B: Shoulders + Back/Biceps",exercises:["Barbell Overhead Press","Rear Delt Machine Fly","Lat Pulldown","Barbell Row","Seated Cable Row","EZ Bar Curl","Incline DB Curl"]},
+  {label:"Day C: Shoulders + Legs/Core",exercises:["Barbell Overhead Press","DB Lateral Raise","Back Squat","Romanian Deadlift","Leg Press","Lying Leg Curl","Cable Crunch"]}
+];
+const LIFT_MODE=(localStorage.getItem('lift_mode_v1')==='gym'?'gym':'home');
+const DEFAULT_PROGRAM=LIFT_MODE==='gym'?DEFAULT_PROGRAM_GYM:DEFAULT_PROGRAM_HOME;
 const loadProgram=()=>{
   const toExerciseObj=e=>{
     const name=typeof e==='string'?e:(e&&typeof e.name==='string'?e.name:'');
@@ -496,7 +501,7 @@ function renderHome(){
     list.appendChild(d);
   });
   customPrograms.forEach((prog,idx)=>{
-    const exNames=prog.exercises.map(e=>e.name);
+    const exNames=prog.exercises.map(e=>typeof e==='string'?e:e.name);
     const entries=wlog.filter(e=>e.day===prog.name);
     const lastDate=entries.length?entries[entries.length-1].date:null;
     const d=document.createElement('div');
@@ -587,7 +592,7 @@ function saveAndNext(){
   const entries=wsets.map((s,i)=>({
     date:todayStr(),day:currentDay.label,exercise:name,
     set:i+1,weight:parseFloat(s.weight)||0,reps:parseInt(s.reps)||0
-  }));
+  })).filter(e=>e.weight>0&&e.reps>0);
   wlog=[...wlog,...entries];saveLog(wlog);
   const ws=entries.map(e=>e.weight).filter(Boolean);
   if(ws.length){const max=Math.max(...ws);if(!prs[name]||max>prs[name]){prs[name]=max;savePRs(prs)}}
@@ -679,7 +684,7 @@ function renderEditList(){
   const day=PROGRAM[editingDayIdx];
   document.getElementById('edit-ex-list').innerHTML=day.exercises.map((ex,i)=>`
     <div class="edit-ex-row">
-      <div class="edit-ex-name">${ex.name}</div>
+      <div class="edit-ex-name">${typeof ex==='string'?ex:ex.name}</div>
       <button class="edit-btn" onclick="moveEx(${i},-1)" ${i===0?'disabled style="opacity:0.3"':''}>&#9650;</button>
       <button class="edit-btn" onclick="moveEx(${i},1)" ${i===day.exercises.length-1?'disabled style="opacity:0.3"':''}>&#9660;</button>
       <button class="edit-btn danger" onclick="removeEx(${i})">&#10005;</button>
@@ -707,7 +712,7 @@ function showAddExercise(){
 
 function renderAddList(){
   const current=PROGRAM[editingDayIdx].exercises;
-  const available=EXERCISES.filter(e=>!current.some(ex=>ex.name===e.name));
+  const available=EXERCISES.filter(e=>!current.some(ex=>(typeof ex==='string'?ex:ex.name)===e.name));
   document.getElementById('add-ex-list').innerHTML=available.length?available.map(ex=>`
     <div class="add-ex-item">
       <span class="add-ex-name">${ex.name}</span>
@@ -787,11 +792,12 @@ function editDefaultProgram(idx){
   editingDefaultProgram=true;
   const prog=PROGRAM[idx];
   programExercises=prog.exercises.map(ex=>{
-    const lib=getEx(ex.name);
+    const name=typeof ex==='string'?ex:ex.name;
+    const lib=getEx(name);
     return {
-      name:ex.name,
-      sets:Number.isFinite(ex.sets)?ex.sets:(lib.sets||3),
-      reps:Number.isFinite(ex.reps)?ex.reps:(lib.reps||8)
+      name,
+      sets:Number.isFinite(ex&&ex.sets)?ex.sets:(lib.sets||3),
+      reps:Number.isFinite(ex&&ex.reps)?ex.reps:(lib.reps||8)
     };
   });
   document.getElementById('program-name-input').value=prog.label;
@@ -806,7 +812,15 @@ function editCustomProgram(idx){
   editingProgramIdx=idx;
   editingDefaultProgram=false;
   const prog=customPrograms[idx];
-  programExercises=prog.exercises.map(e=>({...e}));
+  programExercises=prog.exercises.map(e=>{
+    const name=typeof e==='string'?e:e.name;
+    const lib=getEx(name);
+    return {
+      name,
+      sets:Number.isFinite(e&&e.sets)?e.sets:(lib.sets||3),
+      reps:Number.isFinite(e&&e.reps)?e.reps:(lib.reps||8)
+    };
+  });
   document.getElementById('program-name-input').value=prog.name;
   document.getElementById('create-program-header').textContent='Edit Program';
   document.getElementById('delete-program-btn').style.display='block';
@@ -823,7 +837,7 @@ function renderProgramExercises(){
   }
   list.innerHTML=programExercises.map((ex,i)=>`
     <div class="program-ex-row">
-      <div class="program-ex-name">${ex.name}</div>
+      <div class="program-ex-name">${typeof ex==='string'?ex:ex.name}</div>
       <div class="program-ex-config">
         <input type="number" class="mini-input" value="${ex.sets}" oninput="programExercises[${i}].sets=parseInt(this.value)||0" min="1">
         <span class="mini-label">sets</span>
@@ -855,7 +869,7 @@ function showAddExerciseToProgram(){
 }
 
 function renderProgramAddList(){
-  const currentNames=programExercises.map(e=>e.name);
+  const currentNames=programExercises.map(e=>typeof e==='string'?e:e.name);
   const available=EXERCISES.filter(e=>!currentNames.includes(e.name));
   document.getElementById('program-add-ex-list').innerHTML=available.length?available.map(ex=>`
     <div class="add-ex-item">
@@ -901,7 +915,7 @@ function deleteCustomProgram(){
 
 function startCustomWorkout(idx){
   currentCustomProgram=customPrograms[idx];
-  currentDay={label:currentCustomProgram.name,exercises:currentCustomProgram.exercises.map(e=>e.name)};
+  currentDay={label:currentCustomProgram.name,exercises:currentCustomProgram.exercises.map(e=>typeof e==='string'?e:e.name)};
   activeIdx=0;elapsed=0;
   initExerciseCustom();
   showScreen('workout');
@@ -910,7 +924,8 @@ function startCustomWorkout(idx){
 }
 
 function initExerciseCustom(){
-  const exData=currentCustomProgram.exercises[activeIdx];
+  const raw=currentCustomProgram.exercises[activeIdx];
+  const exData=typeof raw==='string'?{name:raw,sets:getEx(raw).sets||3,reps:getEx(raw).reps||8}:raw;
   const name=exData.name;
   const lw=getLastW(name);
   wsets=[{weight:lw!==''?String(lw):'',reps:'',done:false}];
