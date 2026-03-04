@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LIFT">
+<meta name="theme-color" content="#0a0a0a">
+<title>LIFT</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--card:#111;--border:#1e1e1e;--border2:#2a2a2a;
+  --text:#f0ede8;--muted:#555;--accent:#e8f55a;
+  --accent-dim:rgba(232,245,90,0.15);
+  --safe:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Mono','Courier New',monospace;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+#app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;flex:1}
+.screen.active{display:flex}
+.scroll-body{flex:1;overflow-y:auto;padding:12px 16px 24px;-webkit-overflow-scrolling:touch}
+::-webkit-scrollbar{display:none}
+.header{padding:16px 20px 8px;padding-top:calc(16px + var(--safe-top));display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.5px}
+.logo span{color:var(--accent)}
+.header-right{font-size:12px;color:var(--muted)}
+.nav{display:flex;background:#0d0d0d;border-top:1px solid #1a1a1a;padding-bottom:var(--safe);flex-shrink:0}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;padding:10px 12px;cursor:pointer;letter-spacing:0.5px}
+.nav-btn .icon{font-size:20px;line-height:1}
+.nav-btn.active{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
+.card-row{display:flex;justify-content:space-between;align-items:center}
+.label{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.muted{font-size:12px;color:var(--muted)}
+.tag{display:inline-block;background:#1a1a1a;border:1px solid #252525;border-radius:6px;padding:3px 8px;font-size:11px;color:#888}
+.btn{border:none;border-radius:14px;padding:15px 20px;font-family:'DM Mono',monospace;font-size:14px;font-weight:500;width:100%;cursor:pointer;letter-spacing:0.3px}
+.btn:active{opacity:0.75}
+.btn-primary{background:var(--accent);color:#000}
+.btn-secondary{background:#1a1a1a;color:var(--text);border:1.5px solid var(--border2)}
+.btn-ghost{background:none;color:var(--muted);border:none;font-family:'DM Mono',monospace;font-size:13px;width:100%;padding:14px;cursor:pointer}
+.btn-sm{padding:9px 16px;font-size:13px;border-radius:10px;width:auto}
+.day-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.day-card-info{flex:1;min-width:0}
+.day-name{font-weight:500;font-size:15px;margin-bottom:4px}
+.day-exercises{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day-last{margin-top:6px}
+.workout-header{padding:16px 16px 0;padding-top:calc(16px + var(--safe-top));flex-shrink:0}
+.workout-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.workout-day-label{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.workout-ex-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;line-height:1.2}
+.timer{font-size:24px;font-weight:500;color:var(--accent);font-family:'DM Mono',monospace}
+.ex-counter{font-size:12px;color:var(--muted);text-align:right}
+.progress-dots{display:flex;gap:5px;margin-bottom:14px}
+.prog-dot{height:4px;flex:1;border-radius:2px;transition:background 0.3s}
+.prog-dot.done{background:var(--accent)}
+.prog-dot.current{background:rgba(232,245,90,0.4)}
+.prog-dot.todo{background:#222}
+.ex-stats{display:flex;margin-bottom:14px}
+.ex-stat{flex:1;background:var(--card);border:1px solid var(--border);padding:10px;text-align:center}
+.ex-stat:first-child{border-radius:12px 0 0 12px}
+.ex-stat:last-child{border-radius:0 12px 12px 0}
+.ex-stat+.ex-stat{border-left:none}
+.ex-stat-val{font-size:20px;font-weight:500}
+.ex-stat-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.accent{color:var(--accent)}
+.rest-banner{background:var(--accent-dim);border:1px solid rgba(232,245,90,0.3);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.rest-time{font-size:28px;font-weight:500;color:var(--accent)}
+.rest-skip{background:none;border:1px solid rgba(232,245,90,0.4);border-radius:8px;color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer}
+.sets-header{display:grid;grid-template-columns:24px 1fr 1fr 36px 28px;gap:8px;margin-bottom:6px;padding:0 2px}
+.sets-header span{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center}
+.set-row{display:grid;grid-template-columns:24px 1fr 1fr 36px 28px;gap:8px;align-items:center;margin-bottom:8px}
+.set-num{font-size:13px;color:var(--muted);text-align:center}
+.num-input{background:#141414;border:1.5px solid var(--border2);color:var(--text);border-radius:10px;padding:12px 6px;font-family:'DM Mono',monospace;font-size:17px;width:100%;text-align:center;-webkit-appearance:none;transition:border-color 0.15s}
+.num-input:focus{outline:none;border-color:var(--accent)}
+.num-input.done{border-color:rgba(232,245,90,0.5);background:rgba(232,245,90,0.05)}
+.done-toggle{width:36px;height:36px;border-radius:50%;border:2px solid #2a2a2a;background:transparent;color:var(--muted);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s}
+.done-toggle.done{background:var(--accent);border-color:var(--accent);color:#000}
+.remove-btn{background:none;border:none;color:#333;font-size:20px;cursor:pointer;padding:0;text-align:center;line-height:1}
+.log-entry{padding:10px 0;border-top:1px solid #1a1a1a}
+.log-entry:first-child{border-top:none}
+.log-ex-name{font-size:13px;margin-bottom:4px}
+.log-tags{display:flex;gap:6px;flex-wrap:wrap}
+.pr-row{display:flex;justify-content:space-between;align-items:center;padding:13px 16px}
+.pr-name{font-size:13px}
+.pr-val{font-size:18px;font-weight:500;color:var(--accent);font-family:'DM Mono',monospace}
+.empty{text-align:center;padding:48px 24px;color:var(--muted);font-size:14px}
+.export-row{display:flex;justify-content:flex-end;margin-bottom:14px}
+.export-btn{background:#1a1a1a;border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:7px 14px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div class="screen active" id="screen-home">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right" id="home-date"></div>
+  </div>
+  <div class="scroll-body">
+    <div class="label">Your Program</div>
+    <div id="program-list"></div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="goHome()"><span class="icon">⚡</span>Workout</button>
+    <button class="nav-btn" onclick="goLog()"><span class="icon">📋</span>Log</button>
+    <button class="nav-btn" onclick="goPRs()"><span class="icon">🏆</span>PRs</button>
+  </nav>
+</div>
+
+<div class="screen" id="screen-workout">
+  <div class="workout-header">
+    <div class="workout-top">
+      <div>
+        <div class="workout-day-label" id="w-day-label"></div>
+        <div class="workout-ex-name" id="w-ex-name"></div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="timer" id="w-timer">00:00</div>
+        <div class="ex-counter" id="w-counter"></div>
+      </div>
+    </div>
+    <div class="progress-dots" id="w-progress"></div>
+    <div class="ex-stats" id="w-stats"></div>
+    <div id="rest-banner" style="display:none" class="rest-banner">
+      <div>
+        <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Rest</div>
+        <div class="rest-time" id="rest-countdown"></div>
+      </div>
+      <button class="rest-skip" onclick="skipRest()">Skip &#8594;</button>
+    </div>
+  </div>
+  <div class="scroll-body" id="w-scroll">
+    <div class="sets-header">
+      <span>#</span><span>Weight</span><span>Reps</span><span>Done</span><span></span>
+    </div>
+    <div id="sets-container"></div>
+    <button class="btn btn-secondary" style="margin-bottom:10px" onclick="addSet()">+ Add Set</button>
+    <button class="btn btn-primary" id="next-btn" onclick="saveAndNext()">Save &amp; Next &#8594;</button>
+    <button class="btn-ghost" onclick="endWorkoutEarly()">End Workout Early</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-log">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right">History</div>
+  </div>
+  <div class="scroll-body">
+    <div class="export-row">
+      <button class="export-btn" onclick="exportCSV()">&#8595; Export CSV</button>
+    </div>
+    <div id="log-list"></div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn" onclick="goHome()"><span class="icon">⚡</span>Workout</button>
+    <button class="nav-btn active" onclick="goLog()"><span class="icon">📋</span>Log</button>
+    <button class="nav-btn" onclick="goPRs()"><span class="icon">🏆</span>PRs</button>
+  </nav>
+</div>
+
+<div class="screen" id="screen-prs">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right">Records</div>
+  </div>
+  <div class="scroll-body">
+    <div class="label">Personal Records</div>
+    <div id="pr-list"></div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn" onclick="goHome()"><span class="icon">⚡</span>Workout</button>
+    <button class="nav-btn" onclick="goLog()"><span class="icon">📋</span>Log</button>
+    <button class="nav-btn active" onclick="goPRs()"><span class="icon">🏆</span>PRs</button>
+  </nav>
+</div>
+
+</div>
+<script>
+const EXERCISES=[
+  {name:"Flat DB Bench Press",sets:3,reps:8,inc:5},
+  {name:"Incline DB Bench Press",sets:3,reps:8,inc:5},
+  {name:"DB Overhead Press",sets:3,reps:8,inc:5},
+  {name:"DB Lateral Raise",sets:3,reps:12,inc:0},
+  {name:"DB Rear Delt Raise",sets:3,reps:12,inc:0},
+  {name:"Ring Dips",sets:3,reps:8,inc:5},
+  {name:"Pull-ups (Bar)",sets:3,reps:6,inc:5},
+  {name:"Ring Rows",sets:3,reps:10,inc:0},
+  {name:"Ring Pull-ups",sets:3,reps:6,inc:5},
+  {name:"One-Arm DB Row",sets:3,reps:10,inc:5},
+  {name:"DB RDL",sets:3,reps:8,inc:5},
+  {name:"Goblet Squat",sets:3,reps:10,inc:5},
+  {name:"Bulgarian Split Squat",sets:3,reps:8,inc:5},
+  {name:"DB Step-Ups",sets:3,reps:10,inc:5},
+  {name:"EZ Bar Curl",sets:3,reps:10,inc:5},
+  {name:"DB Hammer Curl",sets:3,reps:10,inc:5},
+  {name:"EZ Bar Skull Crushers",sets:3,reps:10,inc:5},
+  {name:"Close-Grip Push-ups",sets:3,reps:12,inc:0},
+  {name:"Ring Face Pull",sets:3,reps:12,inc:0},
+  {name:"Hanging Leg Raise (Bar)",sets:3,reps:12,inc:0},
+  {name:"Core (Plank / Ring Fallout)",sets:3,reps:60,inc:0}
+];
+const PROGRAM=[
+  {label:"Shoulder/Arms A",exercises:["DB Overhead Press","DB Lateral Raise","EZ Bar Curl","EZ Bar Skull Crushers","Ring Face Pull"]},
+  {label:"Chest/Back A",exercises:["Incline DB Bench Press","Pull-ups (Bar)","Flat DB Bench Press","One-Arm DB Row","Ring Rows"]},
+  {label:"Legs",exercises:["DB RDL","Goblet Squat","Bulgarian Split Squat","Hanging Leg Raise (Bar)","Core (Plank / Ring Fallout)"]},
+  {label:"Shoulder/Arms B",exercises:["DB Overhead Press","DB Rear Delt Raise","DB Hammer Curl","Close-Grip Push-ups","Ring Dips"]},
+  {label:"Chest/Back B",exercises:["Flat DB Bench Press","Ring Pull-ups","Incline DB Bench Press","Ring Rows","DB Step-Ups"]}
+];
+const REST_SECS=90;
+const loadLog=()=>{try{return JSON.parse(localStorage.getItem('lift_log_v1')||'[]')}catch{return[]}};
+const saveLog=l=>localStorage.setItem('lift_log_v1',JSON.stringify(l));
+const loadPRs=()=>{try{return JSON.parse(localStorage.getItem('lift_pr_v1')||'{}')}catch{return{}}};
+const savePRs=p=>localStorage.setItem('lift_pr_v1',JSON.stringify(p));
+let wlog=loadLog(),prs=loadPRs();
+let currentDay=null,activeIdx=0,wsets=[];
+let timerIv=null,elapsed=0,restIv=null,restLeft=0;
+const fmtTime=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+const fmtDate=iso=>new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const getLastW=name=>{const e=wlog.filter(x=>x.exercise===name&&x.weight>0);return e.length?e[e.length-1].weight:''};
+const getEx=name=>EXERCISES.find(e=>e.name===name)||{};
+const vibe=p=>{try{if(navigator.vibrate)navigator.vibrate(p)}catch{}};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function goHome(){showScreen('home');renderHome()}
+function goLog(){showScreen('log');renderLog()}
+function goPRs(){showScreen('prs');renderPRs()}
+
+function renderHome(){
+  document.getElementById('home-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const list=document.getElementById('program-list');
+  list.innerHTML='';
+  PROGRAM.forEach(day=>{
+    const entries=wlog.filter(e=>e.day===day.label);
+    const lastDate=entries.length?entries[entries.length-1].date:null;
+    const d=document.createElement('div');
+    d.className='day-card';
+    d.innerHTML=`
+      <div class="day-card-info">
+        <div class="day-name">${day.label}</div>
+        <div class="day-exercises">${day.exercises.slice(0,3).join(' · ')}${day.exercises.length>3?' ···':''}</div>
+        ${lastDate?`<div class="day-last"><span class="tag">Last: ${fmtDate(lastDate)}</span></div>`:''}
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="startWorkout('${day.label}')">Start &#8594;</button>`;
+    list.appendChild(d);
+  });
+}
+
+function startWorkout(dayLabel){
+  currentDay=PROGRAM.find(d=>d.label===dayLabel);
+  activeIdx=0;elapsed=0;
+  initExercise();
+  showScreen('workout');
+  clearInterval(timerIv);
+  timerIv=setInterval(()=>{elapsed++;document.getElementById('w-timer').textContent=fmtTime(elapsed)},1000);
+}
+
+function initExercise(){
+  const name=currentDay.exercises[activeIdx];
+  const info=getEx(name);
+  const lw=getLastW(name);
+  wsets=[{weight:lw!==''?String(lw):'',reps:'',done:false}];
+  document.getElementById('w-day-label').textContent=currentDay.label;
+  document.getElementById('w-ex-name').textContent=name;
+  document.getElementById('w-counter').textContent=`${activeIdx+1} / ${currentDay.exercises.length}`;
+  document.getElementById('w-progress').innerHTML=currentDay.exercises.map((_,i)=>{
+    const c=i<activeIdx?'done':i===activeIdx?'current':'todo';
+    return`<div class="prog-dot ${c}"></div>`;
+  }).join('');
+  const pr=prs[name];
+  document.getElementById('w-stats').innerHTML=`
+    <div class="ex-stat"><div class="ex-stat-val accent">${info.reps||'—'}</div><div class="ex-stat-label">Target</div></div>
+    <div class="ex-stat"><div class="ex-stat-val">${info.sets||'—'}</div><div class="ex-stat-label">Sets</div></div>
+    <div class="ex-stat"><div class="ex-stat-val">${pr?'&#127942; '+pr:'—'}</div><div class="ex-stat-label">PR</div></div>`;
+  renderSets();
+  stopRest();
+  document.getElementById('next-btn').textContent=activeIdx<currentDay.exercises.length-1?'Save & Next \u2192':'Finish Workout \uD83C\uDF89';
+  document.getElementById('w-scroll').scrollTo(0,0);
+}
+
+function renderSets(){
+  document.getElementById('sets-container').innerHTML=wsets.map((s,i)=>`
+    <div class="set-row">
+      <div class="set-num">${i+1}</div>
+      <input class="num-input${s.done?' done':''}" type="number" inputmode="decimal" placeholder="lbs" value="${s.weight}" oninput="wsets[${i}].weight=this.value">
+      <input class="num-input${s.done?' done':''}" type="number" inputmode="numeric" placeholder="reps" value="${s.reps}" oninput="wsets[${i}].reps=this.value">
+      <button class="done-toggle${s.done?' done':''}" onclick="toggleDone(${i})">${s.done?'&#10003;':'&#9675;'}</button>
+      <button class="remove-btn" onclick="removeSet(${i})">&#215;</button>
+    </div>`).join('');
+}
+
+function toggleDone(i){
+  wsets[i].done=!wsets[i].done;
+  vibe(wsets[i].done?[10,20,10]:[5]);
+  renderSets();
+  if(wsets[i].done)startRest();
+}
+function addSet(){const l=wsets[wsets.length-1];wsets.push({weight:l.weight,reps:'',done:false});renderSets()}
+function removeSet(i){if(wsets.length===1)return;wsets.splice(i,1);renderSets()}
+
+function startRest(){
+  stopRest();restLeft=REST_SECS;
+  document.getElementById('rest-banner').style.display='flex';
+  document.getElementById('rest-countdown').textContent=fmtTime(restLeft);
+  restIv=setInterval(()=>{
+    restLeft--;
+    document.getElementById('rest-countdown').textContent=fmtTime(restLeft);
+    if(restLeft<=10)vibe([5]);
+    if(restLeft<=0){stopRest();vibe([100,50,100])}
+  },1000);
+}
+function stopRest(){clearInterval(restIv);const b=document.getElementById('rest-banner');if(b)b.style.display='none'}
+function skipRest(){stopRest();vibe([10])}
+
+function saveAndNext(){
+  const name=currentDay.exercises[activeIdx];
+  const entries=wsets.map((s,i)=>({
+    date:todayStr(),day:currentDay.label,exercise:name,
+    set:i+1,weight:parseFloat(s.weight)||0,reps:parseInt(s.reps)||0
+  }));
+  wlog=[...wlog,...entries];saveLog(wlog);
+  const ws=entries.map(e=>e.weight).filter(Boolean);
+  if(ws.length){const max=Math.max(...ws);if(!prs[name]||max>prs[name]){prs[name]=max;savePRs(prs)}}
+  vibe([15,30,15]);
+  if(activeIdx<currentDay.exercises.length-1){activeIdx++;initExercise()}
+  else endWorkout();
+}
+function endWorkout(){clearInterval(timerIv);stopRest();goHome()}
+function endWorkoutEarly(){if(confirm('End workout early?'))endWorkout()}
+
+function renderLog(){
+  const list=document.getElementById('log-list');
+  if(!wlog.length){list.innerHTML='<div class="empty">No workouts logged yet.<br>Start your first session!</div>';return}
+  const groups=[];const seen=new Set();
+  [...wlog].reverse().forEach(e=>{const k=e.date+'|'+e.day;if(!seen.has(k)){seen.add(k);groups.push({date:e.date,day:e.day})}});
+  list.innerHTML=groups.slice(0,20).map(g=>{
+    const entries=wlog.filter(e=>e.date===g.date&&e.day===g.day);
+    const exNames=[...new Set(entries.map(e=>e.exercise))];
+    return`<div class="card">
+      <div class="card-row" style="margin-bottom:12px"><span style="font-weight:500">${g.day}</span><span class="muted">${fmtDate(g.date)}</span></div>
+      ${exNames.map(ex=>{
+        const xs=entries.filter(e=>e.exercise===ex);
+        const ws=xs.map(s=>s.weight).filter(Boolean);
+        const maxW=ws.length?Math.max(...ws):0;
+        const totalReps=xs.reduce((a,s)=>a+s.reps,0);
+        const vol=xs.reduce((a,s)=>a+(s.weight*s.reps||0),0);
+        return`<div class="log-entry">
+          <div class="log-ex-name">${ex}</div>
+          <div class="log-tags">
+            <span class="tag">${xs.length} sets</span>
+            ${maxW?`<span class="tag">${maxW} lbs top</span>`:''}
+            ${totalReps?`<span class="tag">${totalReps} reps</span>`:''}
+            ${vol?`<span class="tag">${vol} vol</span>`:''}
+          </div></div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderPRs(){
+  document.getElementById('pr-list').innerHTML=EXERCISES.map(ex=>{
+    const pr=prs[ex.name];
+    const last=wlog.filter(e=>e.exercise===ex.name&&e.weight>0);
+    const lw=last.length?last[last.length-1].weight:null;
+    return`<div class="card" style="padding:0"><div class="pr-row">
+      <div><div class="pr-name">${ex.name}</div>${lw?`<div class="muted" style="margin-top:2px">Last: ${lw} lbs</div>`:''}</div>
+      <div class="pr-val">${pr?'&#127942; '+pr:'&#8212;'}</div>
+    </div></div>`;
+  }).join('');
+}
+
+function exportCSV(){
+  if(!wlog.length){alert('No data to export yet.');return}
+  const header='Date,Day,Exercise,Set,Weight (lbs),Reps,Volume\n';
+  const rows=wlog.map(e=>`${e.date},${e.day},"${e.exercise}",${e.set},${e.weight},${e.reps},${e.weight*e.reps}`).join('\n');
+  const blob=new Blob([header+rows],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='lift-log-'+todayStr()+'.csv';a.click();URL.revokeObjectURL(url);
+}
+
+renderHome();
+</script>
+</body>
+</html>
