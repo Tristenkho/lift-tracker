@@ -18,8 +18,8 @@
   --safe:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px);
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Mono','Courier New',monospace;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
-#app{max-width:480px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
-.screen{display:none;flex-direction:column;flex:1}
+#app{max-width:480px;margin:0 auto;height:100dvh;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;flex:1;min-height:0}
 .screen.active{display:flex}
 .scroll-body{flex:1;overflow-y:auto;padding:12px 16px 24px;-webkit-overflow-scrolling:touch}
 ::-webkit-scrollbar{display:none}
@@ -89,6 +89,50 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Mon
 .empty{text-align:center;padding:48px 24px;color:var(--muted);font-size:14px}
 .export-row{display:flex;justify-content:flex-end;margin-bottom:14px}
 .export-btn{background:#1a1a1a;border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:7px 14px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer}
+.btn-edit{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:9px 12px;font-size:12px;border-radius:10px;width:auto;margin-right:8px}
+.edit-ex-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.edit-ex-name{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.edit-btn{background:#1a1a1a;border:1px solid var(--border2);color:var(--muted);width:36px;height:36px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.edit-btn:active{background:#252525}
+.edit-btn.danger{color:#e55}
+.add-ex-list{max-height:50vh;overflow-y:auto;margin-bottom:12px}
+.add-ex-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border)}
+.add-ex-item:last-child{border-bottom:none}
+.add-ex-name{font-size:13px}
+.text-input{background:#141414;border:1.5px solid var(--border2);color:var(--text);border-radius:10px;padding:12px 14px;font-family:'DM Mono',monospace;font-size:15px;width:100%;-webkit-appearance:none}
+.text-input:focus{outline:none;border-color:var(--accent)}
+.text-input::placeholder{color:#444}
+.form-group{margin-bottom:16px}
+.form-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block}
+.program-ex-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.program-ex-name{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.program-ex-config{display:flex;gap:6px;align-items:center}
+.mini-input{background:#141414;border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 4px;font-family:'DM Mono',monospace;font-size:14px;width:48px;text-align:center;-webkit-appearance:none}
+.mini-input:focus{outline:none;border-color:var(--accent)}
+.mini-label{font-size:10px;color:var(--muted)}
+.program-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
+.program-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.program-card-name{font-weight:500;font-size:15px}
+.program-card-meta{font-size:11px;color:var(--muted)}
+.program-card-actions{display:flex;gap:8px}
+.custom-tag{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(232,245,90,0.3);border-radius:6px;padding:2px 8px;font-size:10px;letter-spacing:0.5px}
+.lib-ex-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px}
+.lib-ex-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.lib-ex-name{font-size:14px;font-weight:500}
+.lib-ex-stats{display:flex;gap:12px}
+.lib-ex-stat{display:flex;align-items:center;gap:4px}
+.lib-ex-stat input{width:44px}
+.lib-ex-stat-label{font-size:10px;color:var(--muted);text-transform:uppercase}
+.lib-actions{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.log-entry-header{display:flex;justify-content:space-between;align-items:center}
+.log-edit-btn{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:4px 8px}
+.log-session-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.pr-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0;margin-bottom:8px}
+.pr-row-edit{display:flex;justify-content:space-between;align-items:center;padding:13px 16px}
+.pr-edit-btn{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:4px}
+.pr-input{background:#141414;border:1.5px solid var(--border2);color:var(--accent);border-radius:8px;padding:6px 8px;font-family:'DM Mono',monospace;font-size:16px;width:70px;text-align:center}
+.pr-input:focus{outline:none;border-color:var(--accent)}
+.recalc-row{display:flex;justify-content:flex-end;margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -105,6 +149,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Mon
   </div>
   <nav class="nav">
     <button class="nav-btn active" onclick="goHome()"><span class="icon">⚡</span>Workout</button>
+    <button class="nav-btn" onclick="goPrograms()"><span class="icon">📝</span>Programs</button>
+    <button class="nav-btn" onclick="goLibrary()"><span class="icon">📚</span>Library</button>
     <button class="nav-btn" onclick="goLog()"><span class="icon">📋</span>Log</button>
     <button class="nav-btn" onclick="goPRs()"><span class="icon">🏆</span>PRs</button>
   </nav>
@@ -156,6 +202,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Mon
   </div>
   <nav class="nav">
     <button class="nav-btn" onclick="goHome()"><span class="icon">⚡</span>Workout</button>
+    <button class="nav-btn" onclick="goPrograms()"><span class="icon">📝</span>Programs</button>
+    <button class="nav-btn" onclick="goLibrary()"><span class="icon">📚</span>Library</button>
     <button class="nav-btn active" onclick="goLog()"><span class="icon">📋</span>Log</button>
     <button class="nav-btn" onclick="goPRs()"><span class="icon">🏆</span>PRs</button>
   </nav>
@@ -167,19 +215,154 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Mon
     <div class="header-right">Records</div>
   </div>
   <div class="scroll-body">
+    <div class="recalc-row">
+      <button class="export-btn" onclick="recalculatePRs()">&#8635; Recalculate PRs</button>
+    </div>
     <div class="label">Personal Records</div>
     <div id="pr-list"></div>
   </div>
   <nav class="nav">
     <button class="nav-btn" onclick="goHome()"><span class="icon">⚡</span>Workout</button>
+    <button class="nav-btn" onclick="goPrograms()"><span class="icon">📝</span>Programs</button>
+    <button class="nav-btn" onclick="goLibrary()"><span class="icon">📚</span>Library</button>
     <button class="nav-btn" onclick="goLog()"><span class="icon">📋</span>Log</button>
     <button class="nav-btn active" onclick="goPRs()"><span class="icon">🏆</span>PRs</button>
   </nav>
 </div>
 
+<div class="screen" id="screen-edit">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right" id="edit-day-label"></div>
+  </div>
+  <div class="scroll-body">
+    <div class="label">Exercises</div>
+    <div id="edit-ex-list"></div>
+    <button class="btn btn-secondary" style="margin-bottom:10px" onclick="showAddExercise()">+ Add Exercise</button>
+    <div id="add-ex-container" style="display:none">
+      <div class="label" style="margin-top:16px">Available Exercises</div>
+      <div class="card" style="padding:0">
+        <div class="add-ex-list" id="add-ex-list"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="saveEditAndGoHome()">Save Changes</button>
+    <button class="btn-ghost" onclick="goHome()">Cancel</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-programs">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right">Programs</div>
+  </div>
+  <div class="scroll-body">
+    <div class="label">Default Programs</div>
+    <div id="default-programs-list"></div>
+    <div class="label" style="margin-top:20px">Custom Programs</div>
+    <div id="custom-programs-list"></div>
+    <button class="btn btn-primary" onclick="createNewProgram()">+ Create New Program</button>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn" onclick="goHome()"><span class="icon">⚡</span>Workout</button>
+    <button class="nav-btn active" onclick="goPrograms()"><span class="icon">📝</span>Programs</button>
+    <button class="nav-btn" onclick="goLibrary()"><span class="icon">📚</span>Library</button>
+    <button class="nav-btn" onclick="goLog()"><span class="icon">📋</span>Log</button>
+    <button class="nav-btn" onclick="goPRs()"><span class="icon">🏆</span>PRs</button>
+  </nav>
+</div>
+
+<div class="screen" id="screen-create-program">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right" id="create-program-header">New Program</div>
+  </div>
+  <div class="scroll-body">
+    <div class="form-group">
+      <label class="form-label">Program Name</label>
+      <input type="text" class="text-input" id="program-name-input" placeholder="e.g., Push Day">
+    </div>
+    <div class="label">Exercises</div>
+    <div id="program-exercises-list"></div>
+    <button class="btn btn-secondary" style="margin-bottom:10px" onclick="showAddExerciseToProgram()">+ Add Exercise</button>
+    <div id="program-add-ex-container" style="display:none">
+      <div class="label" style="margin-top:16px">Exercise Library</div>
+      <div class="card" style="padding:0">
+        <div class="add-ex-list" id="program-add-ex-list"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="saveCustomProgram()">Save Program</button>
+    <button class="btn-ghost" onclick="goPrograms()">Cancel</button>
+    <button class="btn-ghost" id="delete-program-btn" style="color:#e55;display:none" onclick="deleteCustomProgram()">Delete Program</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-library">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right">Library</div>
+  </div>
+  <div class="scroll-body">
+    <div class="label">Exercise Library</div>
+    <div id="library-list"></div>
+    <button class="btn btn-primary" onclick="createNewExercise()">+ Add New Exercise</button>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn" onclick="goHome()"><span class="icon">⚡</span>Workout</button>
+    <button class="nav-btn" onclick="goPrograms()"><span class="icon">📝</span>Programs</button>
+    <button class="nav-btn active" onclick="goLibrary()"><span class="icon">📚</span>Library</button>
+    <button class="nav-btn" onclick="goLog()"><span class="icon">📋</span>Log</button>
+    <button class="nav-btn" onclick="goPRs()"><span class="icon">🏆</span>PRs</button>
+  </nav>
+</div>
+
+<div class="screen" id="screen-create-exercise">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right" id="create-ex-header">New Exercise</div>
+  </div>
+  <div class="scroll-body">
+    <div class="form-group">
+      <label class="form-label">Exercise Name</label>
+      <input type="text" class="text-input" id="ex-name-input" placeholder="e.g., Barbell Squat">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Default Sets</label>
+      <input type="number" class="text-input" id="ex-sets-input" placeholder="3" min="1">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target Reps</label>
+      <input type="number" class="text-input" id="ex-reps-input" placeholder="8" min="1">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Weight Increment (lbs)</label>
+      <input type="number" class="text-input" id="ex-inc-input" placeholder="5" min="0">
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="saveExercise()">Save Exercise</button>
+    <button class="btn-ghost" onclick="goLibrary()">Cancel</button>
+    <button class="btn-ghost" id="delete-ex-btn" style="color:#e55;display:none" onclick="deleteExercise()">Delete Exercise</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-edit-log">
+  <div class="header">
+    <div class="logo">LIFT<span>.</span></div>
+    <div class="header-right" id="edit-log-header">Edit Entry</div>
+  </div>
+  <div class="scroll-body">
+    <div class="label" id="edit-log-ex-name"></div>
+    <div class="sets-header" style="grid-template-columns:24px 1fr 1fr 28px">
+      <span>#</span><span>Weight</span><span>Reps</span><span></span>
+    </div>
+    <div id="edit-log-sets"></div>
+    <button class="btn btn-secondary" style="margin-bottom:10px" onclick="addLogSet()">+ Add Set</button>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="saveLogEdit()">Save Changes</button>
+    <button class="btn-ghost" onclick="goLog()">Cancel</button>
+  </div>
+</div>
+
 </div>
 <script>
-const EXERCISES=[
+const DEFAULT_EXERCISES=[
   {name:"Flat DB Bench Press",sets:3,reps:8,inc:5},
   {name:"Incline DB Bench Press",sets:3,reps:8,inc:5},
   {name:"DB Overhead Press",sets:3,reps:8,inc:5},
@@ -202,20 +385,44 @@ const EXERCISES=[
   {name:"Hanging Leg Raise (Bar)",sets:3,reps:12,inc:0},
   {name:"Core (Plank / Ring Fallout)",sets:3,reps:60,inc:0}
 ];
-const PROGRAM=[
+const loadExercises=()=>{try{return JSON.parse(localStorage.getItem('lift_exercises_v1'))||DEFAULT_EXERCISES.map(e=>({...e}))}catch{return DEFAULT_EXERCISES.map(e=>({...e}))}};
+const saveExercises=e=>localStorage.setItem('lift_exercises_v1',JSON.stringify(e));
+let EXERCISES=loadExercises();
+const DEFAULT_PROGRAM=[
   {label:"Shoulder/Arms A",exercises:["DB Overhead Press","DB Lateral Raise","EZ Bar Curl","EZ Bar Skull Crushers","Ring Face Pull"]},
   {label:"Chest/Back A",exercises:["Incline DB Bench Press","Pull-ups (Bar)","Flat DB Bench Press","One-Arm DB Row","Ring Rows"]},
   {label:"Legs",exercises:["DB RDL","Goblet Squat","Bulgarian Split Squat","Hanging Leg Raise (Bar)","Core (Plank / Ring Fallout)"]},
   {label:"Shoulder/Arms B",exercises:["DB Overhead Press","DB Rear Delt Raise","DB Hammer Curl","Close-Grip Push-ups","Ring Dips"]},
   {label:"Chest/Back B",exercises:["Flat DB Bench Press","Ring Pull-ups","Incline DB Bench Press","Ring Rows","DB Step-Ups"]}
 ];
+const loadProgram=()=>{
+  try{
+    const saved=JSON.parse(localStorage.getItem('lift_program_v2'));
+    if(saved)return saved;
+    // Migrate from v1 (string arrays) or use defaults
+    const v1=JSON.parse(localStorage.getItem('lift_program_v1'));
+    if(v1){
+      return v1.map(d=>({
+        label:d.label,
+        exercises:d.exercises.map(e=>typeof e==='string'?{name:e,sets:3,reps:8}:e)
+      }));
+    }
+    return DEFAULT_PROGRAM.map(d=>({label:d.label,exercises:d.exercises.map(name=>({name,sets:3,reps:8}))}));
+  }catch{
+    return DEFAULT_PROGRAM.map(d=>({label:d.label,exercises:d.exercises.map(name=>({name,sets:3,reps:8}))}));
+  }
+};
+const saveProgram=p=>localStorage.setItem('lift_program_v2',JSON.stringify(p));
+let PROGRAM=loadProgram();
 const REST_SECS=90;
 const loadLog=()=>{try{return JSON.parse(localStorage.getItem('lift_log_v1')||'[]')}catch{return[]}};
 const saveLog=l=>localStorage.setItem('lift_log_v1',JSON.stringify(l));
 const loadPRs=()=>{try{return JSON.parse(localStorage.getItem('lift_pr_v1')||'{}')}catch{return{}}};
 const savePRs=p=>localStorage.setItem('lift_pr_v1',JSON.stringify(p));
-let wlog=loadLog(),prs=loadPRs();
-let currentDay=null,activeIdx=0,wsets=[];
+const loadCustomPrograms=()=>{try{return JSON.parse(localStorage.getItem('lift_custom_programs_v1')||'[]')}catch{return[]}};
+const saveCustomPrograms=p=>localStorage.setItem('lift_custom_programs_v1',JSON.stringify(p));
+let wlog=loadLog(),prs=loadPRs(),customPrograms=loadCustomPrograms();
+let currentDay=null,activeIdx=0,wsets=[],currentCustomProgram=null;
 let timerIv=null,elapsed=0,restIv=null,restLeft=0;
 const fmtTime=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 const fmtDate=iso=>new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
@@ -231,12 +438,15 @@ function showScreen(id){
 function goHome(){showScreen('home');renderHome()}
 function goLog(){showScreen('log');renderLog()}
 function goPRs(){showScreen('prs');renderPRs()}
+function goPrograms(){showScreen('programs');renderPrograms()}
+function goLibrary(){showScreen('library');renderLibrary()}
 
 function renderHome(){
   document.getElementById('home-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
   const list=document.getElementById('program-list');
   list.innerHTML='';
-  PROGRAM.forEach(day=>{
+  PROGRAM.forEach((day,idx)=>{
+    const exNames=day.exercises.map(e=>typeof e==='string'?e:e.name);
     const entries=wlog.filter(e=>e.day===day.label);
     const lastDate=entries.length?entries[entries.length-1].date:null;
     const d=document.createElement('div');
@@ -244,18 +454,37 @@ function renderHome(){
     d.innerHTML=`
       <div class="day-card-info">
         <div class="day-name">${day.label}</div>
-        <div class="day-exercises">${day.exercises.slice(0,3).join(' · ')}${day.exercises.length>3?' ···':''}</div>
+        <div class="day-exercises">${exNames.slice(0,3).join(' · ')}${exNames.length>3?' ···':''}</div>
         ${lastDate?`<div class="day-last"><span class="tag">Last: ${fmtDate(lastDate)}</span></div>`:''}
       </div>
       <button class="btn btn-primary btn-sm" onclick="startWorkout('${day.label}')">Start &#8594;</button>`;
     list.appendChild(d);
   });
+  customPrograms.forEach((prog,idx)=>{
+    const exNames=prog.exercises.map(e=>e.name);
+    const entries=wlog.filter(e=>e.day===prog.name);
+    const lastDate=entries.length?entries[entries.length-1].date:null;
+    const d=document.createElement('div');
+    d.className='day-card';
+    d.innerHTML=`
+      <div class="day-card-info">
+        <div class="day-name">${prog.name} <span class="custom-tag">CUSTOM</span></div>
+        <div class="day-exercises">${exNames.slice(0,3).join(' · ')}${exNames.length>3?' ···':''}</div>
+        ${lastDate?`<div class="day-last"><span class="tag">Last: ${fmtDate(lastDate)}</span></div>`:''}
+      </div>
+      <button class="btn btn-edit btn-sm" onclick="editCustomProgram(${idx})">Edit</button>
+      <button class="btn btn-primary btn-sm" onclick="startCustomWorkout(${idx})">Start &#8594;</button>`;
+    list.appendChild(d);
+  });
 }
 
 function startWorkout(dayLabel){
-  currentDay=PROGRAM.find(d=>d.label===dayLabel);
+  const prog=PROGRAM.find(d=>d.label===dayLabel);
+  // Convert to custom program format for consistent handling
+  currentCustomProgram={name:prog.label,exercises:prog.exercises.map(e=>typeof e==='string'?{name:e,sets:3,reps:8}:e)};
+  currentDay={label:prog.label,exercises:currentCustomProgram.exercises.map(e=>e.name)};
   activeIdx=0;elapsed=0;
-  initExercise();
+  initExerciseCustom();
   showScreen('workout');
   clearInterval(timerIv);
   timerIv=setInterval(()=>{elapsed++;document.getElementById('w-timer').textContent=fmtTime(elapsed)},1000);
@@ -328,10 +557,14 @@ function saveAndNext(){
   const ws=entries.map(e=>e.weight).filter(Boolean);
   if(ws.length){const max=Math.max(...ws);if(!prs[name]||max>prs[name]){prs[name]=max;savePRs(prs)}}
   vibe([15,30,15]);
-  if(activeIdx<currentDay.exercises.length-1){activeIdx++;initExercise()}
+  if(activeIdx<currentDay.exercises.length-1){
+    activeIdx++;
+    if(currentCustomProgram)initExerciseCustom();
+    else initExercise();
+  }
   else endWorkout();
 }
-function endWorkout(){clearInterval(timerIv);stopRest();goHome()}
+function endWorkout(){clearInterval(timerIv);stopRest();currentCustomProgram=null;goHome()}
 function endWorkoutEarly(){if(confirm('End workout early?'))endWorkout()}
 
 function renderLog(){
@@ -342,16 +575,22 @@ function renderLog(){
   list.innerHTML=groups.slice(0,20).map(g=>{
     const entries=wlog.filter(e=>e.date===g.date&&e.day===g.day);
     const exNames=[...new Set(entries.map(e=>e.exercise))];
+    const dateEnc=encodeURIComponent(g.date);
+    const dayEnc=encodeURIComponent(g.day);
     return`<div class="card">
       <div class="card-row" style="margin-bottom:12px"><span style="font-weight:500">${g.day}</span><span class="muted">${fmtDate(g.date)}</span></div>
       ${exNames.map(ex=>{
+        const exEnc=encodeURIComponent(ex);
         const xs=entries.filter(e=>e.exercise===ex);
         const ws=xs.map(s=>s.weight).filter(Boolean);
         const maxW=ws.length?Math.max(...ws):0;
         const totalReps=xs.reduce((a,s)=>a+s.reps,0);
         const vol=xs.reduce((a,s)=>a+(s.weight*s.reps||0),0);
         return`<div class="log-entry">
-          <div class="log-ex-name">${ex}</div>
+          <div class="log-entry-header">
+            <div class="log-ex-name">${ex}</div>
+            <button class="log-edit-btn" onclick="editLogEntry('${dateEnc}','${dayEnc}','${exEnc}')">&#9998;</button>
+          </div>
           <div class="log-tags">
             <span class="tag">${xs.length} sets</span>
             ${maxW?`<span class="tag">${maxW} lbs top</span>`:''}
@@ -359,6 +598,9 @@ function renderLog(){
             ${vol?`<span class="tag">${vol} vol</span>`:''}
           </div></div>`;
       }).join('')}
+      <div class="log-session-actions">
+        <button class="btn btn-sm btn-secondary" style="color:#e55" onclick="deleteLogSession('${dateEnc}','${dayEnc}')">Delete Session</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -368,9 +610,14 @@ function renderPRs(){
     const pr=prs[ex.name];
     const last=wlog.filter(e=>e.exercise===ex.name&&e.weight>0);
     const lw=last.length?last[last.length-1].weight:null;
-    return`<div class="card" style="padding:0"><div class="pr-row">
+    const nameEnc=encodeURIComponent(ex.name);
+    return`<div class="pr-card"><div class="pr-row-edit">
       <div><div class="pr-name">${ex.name}</div>${lw?`<div class="muted" style="margin-top:2px">Last: ${lw} lbs</div>`:''}</div>
-      <div class="pr-val">${pr?'&#127942; '+pr:'&#8212;'}</div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span style="color:var(--muted);font-size:12px">PR:</span>
+        <input type="number" class="pr-input" value="${pr||''}" placeholder="—" onchange="updatePR('${nameEnc}',this.value)" inputmode="decimal">
+        <span style="color:var(--muted);font-size:12px">lbs</span>
+      </div>
     </div></div>`;
   }).join('');
 }
@@ -382,6 +629,442 @@ function exportCSV(){
   const blob=new Blob([header+rows],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='lift-log-'+todayStr()+'.csv';a.click();URL.revokeObjectURL(url);
+}
+
+let editingDayIdx=null;
+function editDay(idx){
+  editingDayIdx=idx;
+  document.getElementById('edit-day-label').textContent=PROGRAM[idx].label;
+  document.getElementById('add-ex-container').style.display='none';
+  renderEditList();
+  showScreen('edit');
+}
+
+function renderEditList(){
+  const day=PROGRAM[editingDayIdx];
+  document.getElementById('edit-ex-list').innerHTML=day.exercises.map((ex,i)=>`
+    <div class="edit-ex-row">
+      <div class="edit-ex-name">${ex}</div>
+      <button class="edit-btn" onclick="moveEx(${i},-1)" ${i===0?'disabled style="opacity:0.3"':''}>&#9650;</button>
+      <button class="edit-btn" onclick="moveEx(${i},1)" ${i===day.exercises.length-1?'disabled style="opacity:0.3"':''}>&#9660;</button>
+      <button class="edit-btn danger" onclick="removeEx(${i})">&#10005;</button>
+    </div>`).join('');
+}
+
+function moveEx(idx,dir){
+  const exs=PROGRAM[editingDayIdx].exercises;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=exs.length)return;
+  [exs[idx],exs[newIdx]]=[exs[newIdx],exs[idx]];
+  renderEditList();
+}
+
+function removeEx(idx){
+  PROGRAM[editingDayIdx].exercises.splice(idx,1);
+  renderEditList();
+}
+
+function showAddExercise(){
+  const container=document.getElementById('add-ex-container');
+  container.style.display=container.style.display==='none'?'block':'none';
+  if(container.style.display==='block')renderAddList();
+}
+
+function renderAddList(){
+  const current=PROGRAM[editingDayIdx].exercises;
+  const available=EXERCISES.filter(e=>!current.includes(e.name));
+  document.getElementById('add-ex-list').innerHTML=available.length?available.map(ex=>`
+    <div class="add-ex-item">
+      <span class="add-ex-name">${ex.name}</span>
+      <button class="btn btn-sm btn-secondary" onclick="addExToDay('${ex.name}')">Add</button>
+    </div>`).join(''):'<div class="empty" style="padding:24px">All exercises added</div>';
+}
+
+function addExToDay(name){
+  PROGRAM[editingDayIdx].exercises.push(name);
+  renderEditList();
+  renderAddList();
+}
+
+function saveEditAndGoHome(){
+  saveProgram(PROGRAM);
+  goHome();
+}
+
+// Custom Programs
+let editingProgramIdx=null;
+let editingDefaultProgram=false;
+let programExercises=[];
+
+function renderPrograms(){
+  // Render default programs
+  const defaultList=document.getElementById('default-programs-list');
+  defaultList.innerHTML=PROGRAM.map((prog,idx)=>`
+    <div class="program-card">
+      <div class="program-card-header">
+        <div>
+          <div class="program-card-name">${prog.label}</div>
+          <div class="program-card-meta">${prog.exercises.length} exercises</div>
+        </div>
+        <div class="program-card-actions">
+          <button class="btn btn-edit btn-sm" onclick="editDefaultProgram(${idx})">Edit</button>
+          <button class="btn btn-primary btn-sm" onclick="startWorkout('${prog.label}')">Start</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // Render custom programs
+  const list=document.getElementById('custom-programs-list');
+  if(!customPrograms.length){
+    list.innerHTML='<div class="empty" style="padding:24px 0">No custom programs yet.<br>Create your first one!</div>';
+    return;
+  }
+  list.innerHTML=customPrograms.map((prog,idx)=>`
+    <div class="program-card">
+      <div class="program-card-header">
+        <div>
+          <div class="program-card-name">${prog.name} <span class="custom-tag">CUSTOM</span></div>
+          <div class="program-card-meta">${prog.exercises.length} exercises</div>
+        </div>
+        <div class="program-card-actions">
+          <button class="btn btn-edit btn-sm" onclick="editCustomProgram(${idx})">Edit</button>
+          <button class="btn btn-primary btn-sm" onclick="startCustomWorkout(${idx})">Start</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function createNewProgram(){
+  editingProgramIdx=null;
+  editingDefaultProgram=false;
+  programExercises=[];
+  document.getElementById('program-name-input').value='';
+  document.getElementById('create-program-header').textContent='New Program';
+  document.getElementById('delete-program-btn').style.display='none';
+  document.getElementById('program-add-ex-container').style.display='none';
+  renderProgramExercises();
+  showScreen('create-program');
+}
+
+function editDefaultProgram(idx){
+  editingProgramIdx=idx;
+  editingDefaultProgram=true;
+  const prog=PROGRAM[idx];
+  // Convert string array to objects with sets/reps from exercise library
+  programExercises=prog.exercises.map(name=>{
+    const ex=getEx(name);
+    return {name, sets:ex.sets||3, reps:ex.reps||8};
+  });
+  document.getElementById('program-name-input').value=prog.label;
+  document.getElementById('create-program-header').textContent='Edit Program';
+  document.getElementById('delete-program-btn').style.display='none'; // Can't delete default programs
+  document.getElementById('program-add-ex-container').style.display='none';
+  renderProgramExercises();
+  showScreen('create-program');
+}
+
+function editCustomProgram(idx){
+  editingProgramIdx=idx;
+  editingDefaultProgram=false;
+  const prog=customPrograms[idx];
+  programExercises=prog.exercises.map(e=>({...e}));
+  document.getElementById('program-name-input').value=prog.name;
+  document.getElementById('create-program-header').textContent='Edit Program';
+  document.getElementById('delete-program-btn').style.display='block';
+  document.getElementById('program-add-ex-container').style.display='none';
+  renderProgramExercises();
+  showScreen('create-program');
+}
+
+function renderProgramExercises(){
+  const list=document.getElementById('program-exercises-list');
+  if(!programExercises.length){
+    list.innerHTML='<div class="empty" style="padding:16px 0">No exercises added yet.</div>';
+    return;
+  }
+  list.innerHTML=programExercises.map((ex,i)=>`
+    <div class="program-ex-row">
+      <div class="program-ex-name">${ex.name}</div>
+      <div class="program-ex-config">
+        <input type="number" class="mini-input" value="${ex.sets}" oninput="programExercises[${i}].sets=parseInt(this.value)||0" min="1">
+        <span class="mini-label">sets</span>
+        <input type="number" class="mini-input" value="${ex.reps}" oninput="programExercises[${i}].reps=parseInt(this.value)||0" min="1">
+        <span class="mini-label">reps</span>
+      </div>
+      <button class="edit-btn" onclick="moveProgramEx(${i},-1)" ${i===0?'disabled style="opacity:0.3"':''}>&#9650;</button>
+      <button class="edit-btn" onclick="moveProgramEx(${i},1)" ${i===programExercises.length-1?'disabled style="opacity:0.3"':''}>&#9660;</button>
+      <button class="edit-btn danger" onclick="removeProgramEx(${i})">&#10005;</button>
+    </div>`).join('');
+}
+
+function moveProgramEx(idx,dir){
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=programExercises.length)return;
+  [programExercises[idx],programExercises[newIdx]]=[programExercises[newIdx],programExercises[idx]];
+  renderProgramExercises();
+}
+
+function removeProgramEx(idx){
+  programExercises.splice(idx,1);
+  renderProgramExercises();
+}
+
+function showAddExerciseToProgram(){
+  const container=document.getElementById('program-add-ex-container');
+  container.style.display=container.style.display==='none'?'block':'none';
+  if(container.style.display==='block')renderProgramAddList();
+}
+
+function renderProgramAddList(){
+  const currentNames=programExercises.map(e=>e.name);
+  const available=EXERCISES.filter(e=>!currentNames.includes(e.name));
+  document.getElementById('program-add-ex-list').innerHTML=available.length?available.map(ex=>`
+    <div class="add-ex-item">
+      <span class="add-ex-name">${ex.name}</span>
+      <button class="btn btn-sm btn-secondary" onclick="addExToProgram('${ex.name}',${ex.sets},${ex.reps})">Add</button>
+    </div>`).join(''):'<div class="empty" style="padding:24px">All exercises added</div>';
+}
+
+function addExToProgram(name,sets,reps){
+  programExercises.push({name,sets,reps});
+  renderProgramExercises();
+  renderProgramAddList();
+}
+
+function saveCustomProgram(){
+  const name=document.getElementById('program-name-input').value.trim();
+  if(!name){alert('Please enter a program name');return}
+  if(!programExercises.length){alert('Please add at least one exercise');return}
+
+  if(editingDefaultProgram){
+    // Save to default program
+    PROGRAM[editingProgramIdx]={label:name,exercises:programExercises.map(e=>({...e}))};
+    saveProgram(PROGRAM);
+  }else{
+    // Save to custom programs
+    const prog={name,exercises:programExercises.map(e=>({...e}))};
+    if(editingProgramIdx!==null){
+      customPrograms[editingProgramIdx]=prog;
+    }else{
+      customPrograms.push(prog);
+    }
+    saveCustomPrograms(customPrograms);
+  }
+  goPrograms();
+}
+
+function deleteCustomProgram(){
+  if(!confirm('Delete this program?'))return;
+  customPrograms.splice(editingProgramIdx,1);
+  saveCustomPrograms(customPrograms);
+  goPrograms();
+}
+
+function startCustomWorkout(idx){
+  currentCustomProgram=customPrograms[idx];
+  currentDay={label:currentCustomProgram.name,exercises:currentCustomProgram.exercises.map(e=>e.name)};
+  activeIdx=0;elapsed=0;
+  initExerciseCustom();
+  showScreen('workout');
+  clearInterval(timerIv);
+  timerIv=setInterval(()=>{elapsed++;document.getElementById('w-timer').textContent=fmtTime(elapsed)},1000);
+}
+
+function initExerciseCustom(){
+  const exData=currentCustomProgram.exercises[activeIdx];
+  const name=exData.name;
+  const lw=getLastW(name);
+  wsets=[{weight:lw!==''?String(lw):'',reps:'',done:false}];
+  document.getElementById('w-day-label').textContent=currentDay.label;
+  document.getElementById('w-ex-name').textContent=name;
+  document.getElementById('w-counter').textContent=`${activeIdx+1} / ${currentDay.exercises.length}`;
+  document.getElementById('w-progress').innerHTML=currentDay.exercises.map((_,i)=>{
+    const c=i<activeIdx?'done':i===activeIdx?'current':'todo';
+    return`<div class="prog-dot ${c}"></div>`;
+  }).join('');
+  const pr=prs[name];
+  document.getElementById('w-stats').innerHTML=`
+    <div class="ex-stat"><div class="ex-stat-val accent">${exData.reps||'—'}</div><div class="ex-stat-label">Target</div></div>
+    <div class="ex-stat"><div class="ex-stat-val">${exData.sets||'—'}</div><div class="ex-stat-label">Sets</div></div>
+    <div class="ex-stat"><div class="ex-stat-val">${pr?'&#127942; '+pr:'—'}</div><div class="ex-stat-label">PR</div></div>`;
+  renderSets();
+  stopRest();
+  document.getElementById('next-btn').textContent=activeIdx<currentDay.exercises.length-1?'Save & Next \u2192':'Finish Workout \uD83C\uDF89';
+  document.getElementById('w-scroll').scrollTo(0,0);
+}
+
+// Exercise Library
+let editingExIdx=null;
+
+function renderLibrary(){
+  const list=document.getElementById('library-list');
+  list.innerHTML=EXERCISES.map((ex,idx)=>{
+    const isCustom=!DEFAULT_EXERCISES.find(d=>d.name===ex.name);
+    return`<div class="lib-ex-card">
+      <div class="lib-ex-header">
+        <div class="lib-ex-name">${ex.name}${isCustom?' <span class="custom-tag">CUSTOM</span>':''}</div>
+      </div>
+      <div class="lib-ex-stats">
+        <div class="lib-ex-stat">
+          <input type="number" class="mini-input" value="${ex.sets}" onchange="updateExField(${idx},'sets',this.value)" min="1">
+          <span class="lib-ex-stat-label">sets</span>
+        </div>
+        <div class="lib-ex-stat">
+          <input type="number" class="mini-input" value="${ex.reps}" onchange="updateExField(${idx},'reps',this.value)" min="1">
+          <span class="lib-ex-stat-label">reps</span>
+        </div>
+        <div class="lib-ex-stat">
+          <input type="number" class="mini-input" value="${ex.inc}" onchange="updateExField(${idx},'inc',this.value)" min="0">
+          <span class="lib-ex-stat-label">+lbs</span>
+        </div>
+      </div>
+      ${isCustom?`<div class="lib-actions"><button class="btn btn-sm btn-secondary" onclick="editExerciseScreen(${idx})">Rename</button><button class="btn btn-sm btn-secondary" style="color:#e55" onclick="deleteExerciseFromLib(${idx})">Delete</button></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function updateExField(idx,field,value){
+  EXERCISES[idx][field]=parseInt(value)||0;
+  saveExercises(EXERCISES);
+}
+
+function createNewExercise(){
+  editingExIdx=null;
+  document.getElementById('ex-name-input').value='';
+  document.getElementById('ex-sets-input').value='3';
+  document.getElementById('ex-reps-input').value='8';
+  document.getElementById('ex-inc-input').value='5';
+  document.getElementById('create-ex-header').textContent='New Exercise';
+  document.getElementById('delete-ex-btn').style.display='none';
+  showScreen('create-exercise');
+}
+
+function editExerciseScreen(idx){
+  editingExIdx=idx;
+  const ex=EXERCISES[idx];
+  document.getElementById('ex-name-input').value=ex.name;
+  document.getElementById('ex-sets-input').value=ex.sets;
+  document.getElementById('ex-reps-input').value=ex.reps;
+  document.getElementById('ex-inc-input').value=ex.inc;
+  document.getElementById('create-ex-header').textContent='Edit Exercise';
+  document.getElementById('delete-ex-btn').style.display='block';
+  showScreen('create-exercise');
+}
+
+function saveExercise(){
+  const name=document.getElementById('ex-name-input').value.trim();
+  const sets=parseInt(document.getElementById('ex-sets-input').value)||3;
+  const reps=parseInt(document.getElementById('ex-reps-input').value)||8;
+  const inc=parseInt(document.getElementById('ex-inc-input').value)||0;
+  if(!name){alert('Please enter an exercise name');return}
+  if(editingExIdx!==null){
+    EXERCISES[editingExIdx]={name,sets,reps,inc};
+  }else{
+    if(EXERCISES.find(e=>e.name.toLowerCase()===name.toLowerCase())){
+      alert('An exercise with this name already exists');return;
+    }
+    EXERCISES.push({name,sets,reps,inc});
+  }
+  saveExercises(EXERCISES);
+  goLibrary();
+}
+
+function deleteExercise(){
+  if(!confirm('Delete this exercise?'))return;
+  EXERCISES.splice(editingExIdx,1);
+  saveExercises(EXERCISES);
+  goLibrary();
+}
+
+function deleteExerciseFromLib(idx){
+  if(!confirm('Delete this exercise?'))return;
+  EXERCISES.splice(idx,1);
+  saveExercises(EXERCISES);
+  renderLibrary();
+}
+
+// Log Editing
+let editLogDate=null,editLogDay=null,editLogExercise=null,editLogSets=[];
+
+function editLogEntry(dateEnc,dayEnc,exEnc){
+  editLogDate=decodeURIComponent(dateEnc);
+  editLogDay=decodeURIComponent(dayEnc);
+  editLogExercise=decodeURIComponent(exEnc);
+  const entries=wlog.filter(e=>e.date===editLogDate&&e.day===editLogDay&&e.exercise===editLogExercise);
+  editLogSets=entries.map(e=>({weight:e.weight,reps:e.reps}));
+  document.getElementById('edit-log-header').textContent=`${editLogDay} · ${fmtDate(editLogDate)}`;
+  document.getElementById('edit-log-ex-name').textContent=editLogExercise;
+  renderEditLogSets();
+  showScreen('edit-log');
+}
+
+function renderEditLogSets(){
+  document.getElementById('edit-log-sets').innerHTML=editLogSets.map((s,i)=>`
+    <div class="set-row" style="grid-template-columns:24px 1fr 1fr 28px">
+      <div class="set-num">${i+1}</div>
+      <input class="num-input" type="number" inputmode="decimal" placeholder="lbs" value="${s.weight||''}" oninput="editLogSets[${i}].weight=parseFloat(this.value)||0">
+      <input class="num-input" type="number" inputmode="numeric" placeholder="reps" value="${s.reps||''}" oninput="editLogSets[${i}].reps=parseInt(this.value)||0">
+      <button class="remove-btn" onclick="removeLogSet(${i})">&#215;</button>
+    </div>`).join('');
+}
+
+function addLogSet(){
+  const last=editLogSets[editLogSets.length-1]||{weight:0,reps:0};
+  editLogSets.push({weight:last.weight,reps:0});
+  renderEditLogSets();
+}
+
+function removeLogSet(idx){
+  if(editLogSets.length===1)return;
+  editLogSets.splice(idx,1);
+  renderEditLogSets();
+}
+
+function saveLogEdit(){
+  // Remove old entries for this exercise/date/day
+  wlog=wlog.filter(e=>!(e.date===editLogDate&&e.day===editLogDay&&e.exercise===editLogExercise));
+  // Add updated entries
+  editLogSets.forEach((s,i)=>{
+    wlog.push({date:editLogDate,day:editLogDay,exercise:editLogExercise,set:i+1,weight:s.weight||0,reps:s.reps||0});
+  });
+  saveLog(wlog);
+  goLog();
+}
+
+function deleteLogSession(dateEnc,dayEnc){
+  const date=decodeURIComponent(dateEnc);
+  const day=decodeURIComponent(dayEnc);
+  if(!confirm(`Delete entire ${day} session from ${fmtDate(date)}?`))return;
+  wlog=wlog.filter(e=>!(e.date===date&&e.day===day));
+  saveLog(wlog);
+  renderLog();
+}
+
+// PR Editing
+function recalculatePRs(){
+  if(!confirm('Recalculate all PRs from workout history? This will overwrite any manual edits.'))return;
+  const newPRs={};
+  wlog.forEach(e=>{
+    if(e.weight>0){
+      if(!newPRs[e.exercise]||e.weight>newPRs[e.exercise]){
+        newPRs[e.exercise]=e.weight;
+      }
+    }
+  });
+  prs=newPRs;
+  savePRs(prs);
+  renderPRs();
+}
+
+function updatePR(nameEnc,value){
+  const name=decodeURIComponent(nameEnc);
+  const v=parseFloat(value);
+  if(v>0){
+    prs[name]=v;
+  }else{
+    delete prs[name];
+  }
+  savePRs(prs);
 }
 
 renderHome();
