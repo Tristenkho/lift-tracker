@@ -146,7 +146,15 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
     <div class="header-right" id="home-date"></div>
   </div>
   <div class="scroll-body">
-    <div class="label">Your Program</div>
+    <div id="resume-container"></div>
+    <div class="day-card" onclick="startFreeWorkout()" style="border-style:dashed;cursor:pointer;margin-bottom:4px">
+      <div class="day-card-info">
+        <div class="day-name" style="color:var(--accent)">Quick Workout</div>
+        <div class="day-exercises">pick exercises as you go</div>
+      </div>
+      <span style="font-size:22px;color:var(--accent)">&#43;</span>
+    </div>
+    <div class="label" style="margin-top:16px">Your Program</div>
     <div id="program-list"></div>
   </div>
   <nav class="nav">
@@ -188,6 +196,17 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
     <button class="btn btn-secondary" style="margin-bottom:10px" onclick="addSet()">+ Add Set</button>
     <button class="btn btn-primary" id="next-btn" onclick="saveAndNext()">Save &amp; Next &#8594;</button>
     <button class="btn-ghost" onclick="endWorkoutEarly()">End Workout Early</button>
+  </div>
+  <div id="free-ex-panel" style="display:none;flex-direction:column;flex:1;min-height:0">
+    <div style="padding:8px 16px 4px;flex-shrink:0"><div class="label" style="margin-bottom:0">Choose Next Exercise</div></div>
+    <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
+      <div class="card" style="padding:0;margin:0 16px 12px;border-radius:12px">
+        <div id="free-ex-list"></div>
+      </div>
+    </div>
+    <div style="padding:8px 16px;padding-bottom:calc(8px + var(--safe));flex-shrink:0">
+      <button class="btn btn-ghost" onclick="finishFreeWorkout()">End Workout</button>
+    </div>
   </div>
 </div>
 
@@ -464,7 +483,7 @@ const loadCustomPrograms=()=>{
 };
 const saveCustomPrograms=p=>localStorage.setItem('lift_custom_programs_v1',JSON.stringify(p));
 let wlog=loadLog(),prs=loadPRs(),customPrograms=loadCustomPrograms();
-let currentDay=null,activeIdx=0,wsets=[],currentCustomProgram=null;
+let currentDay=null,activeIdx=0,wsets=[],currentCustomProgram=null,isFreeWorkout=false,inFreePicker=false;
 let timerIv=null,elapsed=0,restIv=null,restLeft=0;
 const fmtTime=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 const fmtDate=iso=>new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
@@ -472,6 +491,12 @@ const todayStr=()=>new Date().toISOString().slice(0,10);
 const getLastW=name=>{const e=wlog.filter(x=>x.exercise===name&&x.weight>0);return e.length?e[e.length-1].weight:''};
 const getEx=name=>EXERCISES.find(e=>e.name===name)||{};
 const vibe=p=>{try{if(navigator.vibrate)navigator.vibrate(p)}catch{}};
+const SESS_KEY='lift_session_v1';
+function saveSession(){
+  if(!currentDay||currentDay.exercises.length===0)return;
+  try{localStorage.setItem(SESS_KEY,JSON.stringify({currentDay,activeIdx,wsets,elapsed,currentCustomProgram,isFreeWorkout,inFreePicker}))}catch{}
+}
+function clearSession(){localStorage.removeItem(SESS_KEY)}
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -485,6 +510,9 @@ function goLibrary(){showScreen('library');renderLibrary()}
 
 function renderHome(){
   document.getElementById('home-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const resumeEl=document.getElementById('resume-container');
+  const _sess=localStorage.getItem(SESS_KEY);
+  if(_sess){try{const _s=JSON.parse(_sess);if(_s&&_s.currentDay&&_s.currentDay.exercises.length>0){resumeEl.innerHTML=`<div class="card" style="border-color:rgba(232,245,90,0.3);margin-bottom:14px"><div style="font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Session In Progress</div><div style="font-weight:500;margin-bottom:2px">${_s.currentDay.label}</div><div class="muted">${_s.activeIdx} of ${_s.currentDay.exercises.length} exercises · ${fmtTime(_s.elapsed||0)}</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-primary btn-sm" style="flex:1" onclick="resumeSession()">Resume &#8594;</button><button class="btn btn-secondary btn-sm" style="flex:1" onclick="discardSession()">Discard</button></div></div>`;}else resumeEl.innerHTML='';}catch{resumeEl.innerHTML=''}}else{resumeEl.innerHTML=''}
   const list=document.getElementById('program-list');
   list.innerHTML='';
   PROGRAM.forEach((day,idx)=>{
@@ -530,6 +558,7 @@ function startWorkout(dayLabel){
   showScreen('workout');
   clearInterval(timerIv);
   timerIv=setInterval(()=>{elapsed++;document.getElementById('w-timer').textContent=fmtTime(elapsed)},1000);
+  saveSession();
 }
 
 function initExercise(){
@@ -559,8 +588,8 @@ function renderSets(){
   document.getElementById('sets-container').innerHTML=wsets.map((s,i)=>`
     <div class="set-row">
       <div class="set-num">${i+1}</div>
-      <input class="num-input${s.done?' done':''}" type="number" inputmode="decimal" placeholder="lbs" value="${s.weight}" oninput="wsets[${i}].weight=this.value">
-      <input class="num-input${s.done?' done':''}" type="number" inputmode="numeric" placeholder="reps" value="${s.reps}" oninput="wsets[${i}].reps=this.value">
+      <input class="num-input${s.done?' done':''}" type="number" inputmode="decimal" placeholder="lbs" value="${s.weight}" oninput="wsets[${i}].weight=this.value;saveSession()">
+      <input class="num-input${s.done?' done':''}" type="number" inputmode="numeric" placeholder="reps" value="${s.reps}" oninput="wsets[${i}].reps=this.value;saveSession()">
       <button class="done-toggle${s.done?' done':''}" onclick="toggleDone(${i})">${s.done?'&#10003;':'&#9675;'}</button>
       <button class="remove-btn" onclick="removeSet(${i})">&#215;</button>
     </div>`).join('');
@@ -570,10 +599,11 @@ function toggleDone(i){
   wsets[i].done=!wsets[i].done;
   vibe(wsets[i].done?[10,20,10]:[5]);
   renderSets();
+  saveSession();
   if(wsets[i].done)startRest();
 }
-function addSet(){const l=wsets[wsets.length-1];wsets.push({weight:l.weight,reps:'',done:false});renderSets()}
-function removeSet(i){if(wsets.length===1)return;wsets.splice(i,1);renderSets()}
+function addSet(){const l=wsets[wsets.length-1];wsets.push({weight:l.weight,reps:'',done:false});renderSets();saveSession()}
+function removeSet(i){if(wsets.length===1)return;wsets.splice(i,1);renderSets();saveSession()}
 
 function startRest(){
   stopRest();restLeft=REST_SECS;
@@ -603,10 +633,15 @@ function saveAndNext(){
     activeIdx++;
     if(currentCustomProgram)initExerciseCustom();
     else initExercise();
+    saveSession();
+  }else if(isFreeWorkout){
+    showFreeExPanel();
+    saveSession();
+  }else{
+    endWorkout();
   }
-  else endWorkout();
 }
-function endWorkout(){clearInterval(timerIv);stopRest();currentCustomProgram=null;goHome()}
+function endWorkout(){clearInterval(timerIv);stopRest();currentCustomProgram=null;isFreeWorkout=false;inFreePicker=false;hideFreeExPanel();clearSession();goHome()}
 function endWorkoutEarly(){if(confirm('End workout early?'))endWorkout()}
 
 function renderLog(){
@@ -923,14 +958,14 @@ function startCustomWorkout(idx){
   showScreen('workout');
   clearInterval(timerIv);
   timerIv=setInterval(()=>{elapsed++;document.getElementById('w-timer').textContent=fmtTime(elapsed)},1000);
+  saveSession();
 }
 
-function initExerciseCustom(){
+function initExerciseCustom(keepSets){
   const raw=currentCustomProgram.exercises[activeIdx];
   const exData=typeof raw==='string'?{name:raw,sets:getEx(raw).sets||3,reps:getEx(raw).reps||8}:raw;
   const name=exData.name;
-  const lw=getLastW(name);
-  wsets=[{weight:lw!==''?String(lw):'',reps:'',done:false}];
+  if(!keepSets){const lw=getLastW(name);wsets=[{weight:lw!==''?String(lw):'',reps:'',done:false}]}
   document.getElementById('w-day-label').textContent=currentDay.label;
   document.getElementById('w-ex-name').textContent=name;
   document.getElementById('w-counter').textContent=`${activeIdx+1} / ${currentDay.exercises.length}`;
@@ -945,9 +980,73 @@ function initExerciseCustom(){
     <div class="ex-stat"><div class="ex-stat-val">${pr?'&#127942; '+pr:'—'}</div><div class="ex-stat-label">PR</div></div>`;
   renderSets();
   stopRest();
-  document.getElementById('next-btn').textContent=activeIdx<currentDay.exercises.length-1?'Save & Next \u2192':'Finish Workout \uD83C\uDF89';
+  document.getElementById('next-btn').textContent=activeIdx<currentDay.exercises.length-1?'Save & Next \u2192':isFreeWorkout?'Save \u2192':'Finish Workout \uD83C\uDF89';
   document.getElementById('w-scroll').scrollTo(0,0);
 }
+
+function startFreeWorkout(){
+  isFreeWorkout=true;
+  currentCustomProgram={name:'Quick Workout',exercises:[]};
+  currentDay={label:'Quick Workout',exercises:[]};
+  activeIdx=0;elapsed=0;
+  showScreen('workout');
+  clearInterval(timerIv);
+  timerIv=setInterval(()=>{elapsed++;document.getElementById('w-timer').textContent=fmtTime(elapsed)},1000);
+  showFreeExPanel();
+}
+
+function showFreeExPanel(){
+  inFreePicker=true;
+  document.getElementById('w-scroll').style.display='none';
+  document.getElementById('free-ex-panel').style.display='flex';
+  document.getElementById('w-day-label').textContent='Quick Workout';
+  document.getElementById('w-ex-name').textContent=currentDay.exercises.length?'Add next exercise':'Choose first exercise';
+  document.getElementById('w-counter').textContent=currentDay.exercises.length?`${currentDay.exercises.length} done`:'';
+  document.getElementById('w-progress').innerHTML=currentDay.exercises.map(()=>`<div class="prog-dot done"></div>`).join('')+'<div class="prog-dot current"></div>';
+  document.getElementById('w-stats').innerHTML='';
+  stopRest();
+  document.getElementById('free-ex-list').innerHTML=EXERCISES.map(ex=>`<div class="add-ex-item"><span class="add-ex-name">${ex.name}</span><button class="btn btn-primary btn-sm" onclick="freePickExercise('${ex.name.replace(/'/g,"\\'")}')">+ Add</button></div>`).join('');
+}
+
+function hideFreeExPanel(){
+  inFreePicker=false;
+  document.getElementById('free-ex-panel').style.display='none';
+  document.getElementById('w-scroll').style.display='';
+}
+
+function freePickExercise(name){
+  const ex=getEx(name);
+  currentCustomProgram.exercises.push({name,sets:ex.sets||3,reps:ex.reps||8});
+  currentDay.exercises.push(name);
+  activeIdx=currentDay.exercises.length-1;
+  hideFreeExPanel();
+  initExerciseCustom();
+  saveSession();
+}
+
+function finishFreeWorkout(){endWorkout()}
+
+function resumeSession(){
+  const raw=localStorage.getItem(SESS_KEY);
+  if(!raw)return;
+  try{
+    const s=JSON.parse(raw);
+    currentDay=s.currentDay;
+    activeIdx=s.activeIdx;
+    wsets=s.wsets;
+    elapsed=s.elapsed||0;
+    currentCustomProgram=s.currentCustomProgram;
+    isFreeWorkout=s.isFreeWorkout||false;
+    showScreen('workout');
+    clearInterval(timerIv);
+    timerIv=setInterval(()=>{elapsed++;document.getElementById('w-timer').textContent=fmtTime(elapsed)},1000);
+    document.getElementById('w-timer').textContent=fmtTime(elapsed);
+    if(s.inFreePicker){showFreeExPanel()}
+    else{hideFreeExPanel();initExerciseCustom(true)}
+  }catch{clearSession();renderHome()}
+}
+
+function discardSession(){clearSession();renderHome()}
 
 // Exercise Library
 let editingExIdx=null;
