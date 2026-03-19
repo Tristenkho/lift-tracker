@@ -93,8 +93,8 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
 .export-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:14px}
 .action-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:14px}
 .btn-edit{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:9px 12px;font-size:12px;border-radius:10px;width:auto;margin-right:8px}
-.edit-ex-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
-.edit-ex-name{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.edit-ex-row{display:flex;align-items:flex-start;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.edit-ex-name{flex:1;font-size:13px;min-width:0;overflow:visible;text-overflow:clip;white-space:normal;line-height:1.35;padding-top:8px;cursor:pointer}
 .edit-ex-name.expanded{white-space:normal;overflow:visible;text-overflow:clip}
 .edit-btn{background:#1a1a1a;border:1px solid var(--border2);color:var(--muted);width:36px;height:36px;border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .edit-btn:active{background:#252525}
@@ -109,8 +109,8 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
 .form-group{margin-bottom:16px}
 .form-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block}
 .search-wrap{margin-bottom:12px}
-.program-ex-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
-.program-ex-name{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.program-ex-row{display:flex;align-items:flex-start;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.program-ex-name{flex:1;font-size:13px;min-width:0;overflow:visible;text-overflow:clip;white-space:normal;line-height:1.35;padding-top:8px;cursor:pointer}
 .program-ex-name.expanded{white-space:normal;overflow:visible;text-overflow:clip}
 .program-ex-config{display:flex;gap:6px;align-items:center}
 .mini-input{background:#141414;border:1.5px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 4px;font-family:'DM Mono',monospace;font-size:14px;width:48px;text-align:center;-webkit-appearance:none}
