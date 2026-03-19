@@ -89,6 +89,8 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
 .empty{text-align:center;padding:48px 24px;color:var(--muted);font-size:14px}
 .export-row{display:flex;justify-content:flex-end;margin-bottom:14px}
 .export-btn{background:#1a1a1a;border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:7px 14px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer}
+.export-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:14px}
+.action-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:14px}
 .btn-edit{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:9px 12px;font-size:12px;border-radius:10px;width:auto;margin-right:8px}
 .edit-ex-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
 .edit-ex-name{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
@@ -105,6 +107,7 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
 .text-input::placeholder{color:#444}
 .form-group{margin-bottom:16px}
 .form-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block}
+.search-wrap{margin-bottom:12px}
 .program-ex-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
 .program-ex-name{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 .program-ex-name.expanded{white-space:normal;overflow:visible;text-overflow:clip}
@@ -200,7 +203,10 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
   <div id="free-ex-panel" style="display:none;flex-direction:column;flex:1;min-height:0">
     <div style="padding:8px 16px 4px;flex-shrink:0"><div class="label" style="margin-bottom:0">Choose Next Exercise</div></div>
     <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0">
-      <div class="card" style="padding:0;margin:0 16px 12px;border-radius:12px">
+      <div class="card" style="padding:12px;margin:0 16px 12px;border-radius:12px">
+        <div class="search-wrap">
+          <input type="text" class="text-input" id="free-ex-search" placeholder="Search exercises..." oninput="freeExerciseQuery=this.value;renderFreeExList()">
+        </div>
         <div id="free-ex-list"></div>
       </div>
     </div>
@@ -216,8 +222,11 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
     <div class="header-right">History</div>
   </div>
   <div class="scroll-body">
-    <div class="export-row">
+    <div class="export-actions">
       <button class="export-btn" onclick="exportCSV()">&#8595; Export CSV</button>
+      <button class="export-btn" onclick="exportBackup()">&#8595; Backup JSON</button>
+      <button class="export-btn" onclick="triggerImportBackup()">&#8593; Restore Backup</button>
+      <input type="file" id="backup-file-input" accept="application/json" style="display:none" onchange="importBackup(event)">
     </div>
     <div id="log-list"></div>
   </div>
@@ -277,6 +286,9 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
     <div class="header-right">Programs</div>
   </div>
   <div class="scroll-body">
+    <div class="action-row">
+      <button class="export-btn" onclick="resetDefaultProgram()">Reset Built-in Program</button>
+    </div>
     <div class="label">Default Programs</div>
     <div id="default-programs-list"></div>
     <div class="label" style="margin-top:20px">Custom Programs</div>
@@ -324,6 +336,12 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
   </div>
   <div class="scroll-body">
     <div class="label">Exercise Library</div>
+    <div class="action-row">
+      <button class="export-btn" onclick="resetDefaultExercises()">Reset Built-in Exercises</button>
+    </div>
+    <div class="search-wrap">
+      <input type="text" class="text-input" id="library-search" placeholder="Search exercises..." oninput="libraryQuery=this.value;renderLibrary()">
+    </div>
     <div id="library-list"></div>
     <button class="btn btn-primary" onclick="createNewExercise()">+ Add New Exercise</button>
   </div>
@@ -383,44 +401,54 @@ html,body{height:100%;width:100%;margin:0;padding:0;background:var(--bg);color:v
 
 </div>
 <script>
-const DEFAULT_EXERCISES=[
-  {name:"Flat DB Bench Press",sets:3,reps:8,inc:5},
-  {name:"Incline DB Bench Press",sets:3,reps:8,inc:5},
-  {name:"DB Overhead Press",sets:3,reps:8,inc:5},
-  {name:"DB Lateral Raise",sets:3,reps:12,inc:0},
-  {name:"DB Rear Delt Raise",sets:3,reps:12,inc:0},
-  {name:"Ring Dips",sets:3,reps:8,inc:5},
-  {name:"Pull-ups (Bar)",sets:3,reps:6,inc:5},
-  {name:"Ring Rows",sets:3,reps:10,inc:0},
-  {name:"Ring Pull-ups",sets:3,reps:6,inc:5},
-  {name:"One-Arm DB Row",sets:3,reps:10,inc:5},
-  {name:"DB RDL",sets:3,reps:8,inc:5},
-  {name:"Goblet Squat",sets:3,reps:10,inc:5},
-  {name:"Bulgarian Split Squat",sets:3,reps:8,inc:5},
-  {name:"DB Step-Ups",sets:3,reps:10,inc:5},
-  {name:"EZ Bar Curl",sets:3,reps:10,inc:5},
-  {name:"DB Hammer Curl",sets:3,reps:10,inc:5},
-  {name:"EZ Bar Skull Crushers",sets:3,reps:10,inc:5},
-  {name:"Close-Grip Push-ups",sets:3,reps:12,inc:0},
-  {name:"Ring Face Pull",sets:3,reps:12,inc:0},
-  {name:"Hanging Leg Raise (Bar)",sets:3,reps:12,inc:0},
-  {name:"Core (Plank / Ring Fallout)",sets:3,reps:60,inc:0}
-];
+const CONFIG={
+  appName:'LIFT',
+  restSecs:90,
+  defaultExercises:[
+    {name:"Flat DB Bench Press",sets:3,reps:8,inc:5},
+    {name:"Incline DB Bench Press",sets:3,reps:8,inc:5},
+    {name:"DB Overhead Press",sets:3,reps:8,inc:5},
+    {name:"DB Lateral Raise",sets:3,reps:12,inc:0},
+    {name:"DB Rear Delt Raise",sets:3,reps:12,inc:0},
+    {name:"Ring Dips",sets:3,reps:8,inc:5},
+    {name:"Push-ups",sets:3,reps:15,inc:0},
+    {name:"Pull-ups (Bar)",sets:3,reps:6,inc:5},
+    {name:"Ring Rows",sets:3,reps:10,inc:0},
+    {name:"Ring Pull-ups",sets:3,reps:6,inc:5},
+    {name:"One-Arm DB Row",sets:3,reps:10,inc:5},
+    {name:"Bodyweight Squat",sets:3,reps:20,inc:0},
+    {name:"DB RDL",sets:3,reps:8,inc:5},
+    {name:"Goblet Squat",sets:3,reps:10,inc:5},
+    {name:"Bulgarian Split Squat",sets:3,reps:8,inc:5},
+    {name:"DB Step-Ups",sets:3,reps:10,inc:5},
+    {name:"EZ Bar Curl",sets:3,reps:10,inc:5},
+    {name:"DB Hammer Curl",sets:3,reps:10,inc:5},
+    {name:"EZ Bar Skull Crushers",sets:3,reps:10,inc:5},
+    {name:"Close-Grip Push-ups",sets:3,reps:12,inc:0},
+    {name:"Ring Face Pull",sets:3,reps:12,inc:0},
+    {name:"Hanging Leg Raise (Bar)",sets:3,reps:12,inc:0},
+    {name:"Sit-ups",sets:3,reps:20,inc:0},
+    {name:"Core (Plank / Ring Fallout)",sets:3,reps:60,inc:0}
+  ],
+  defaultPrograms:{
+    home:[
+      {label:"Day A: Chest + Shoulders/Triceps",exercises:["Incline DB Bench Press","Flat DB Bench Press","DB Lateral Raise","Ring Dips","Push-ups","EZ Bar Skull Crushers"]},
+      {label:"Day B: Shoulders + Back/Biceps",exercises:["DB Overhead Press","DB Rear Delt Raise","Pull-ups (Bar)","One-Arm DB Row","Ring Rows","EZ Bar Curl","DB Hammer Curl"]},
+      {label:"Day C: Legs + Core/Shoulders",exercises:["DB Lateral Raise","DB RDL","Goblet Squat","Bodyweight Squat","Bulgarian Split Squat","Sit-ups","Hanging Leg Raise (Bar)"]}
+    ],
+    gym:[
+      {label:"Day A: Shoulders + Chest/Triceps",exercises:["Barbell Overhead Press","Cable Lateral Raise","Incline Barbell Bench Press","Barbell Bench Press","Cable Triceps Pushdown","Machine Chest Fly"]},
+      {label:"Day B: Shoulders + Back/Biceps",exercises:["Barbell Overhead Press","Rear Delt Machine Fly","Lat Pulldown","Barbell Row","Seated Cable Row","EZ Bar Curl","Incline DB Curl"]},
+      {label:"Day C: Shoulders + Legs/Core",exercises:["Barbell Overhead Press","DB Lateral Raise","Back Squat","Romanian Deadlift","Leg Press","Lying Leg Curl","Cable Crunch"]}
+    ]
+  }
+};
+const DEFAULT_EXERCISES=CONFIG.defaultExercises;
 const loadExercises=()=>{try{return JSON.parse(localStorage.getItem('lift_exercises_v1'))||DEFAULT_EXERCISES.map(e=>({...e}))}catch{return DEFAULT_EXERCISES.map(e=>({...e}))}};
 const saveExercises=e=>localStorage.setItem('lift_exercises_v1',JSON.stringify(e));
 let EXERCISES=loadExercises();
-const DEFAULT_PROGRAM_HOME=[
-  {label:"Day A: Shoulders + Chest/Triceps",exercises:["DB Overhead Press","DB Lateral Raise","Incline DB Bench Press","Flat DB Bench Press","EZ Bar Skull Crushers","Ring Dips"]},
-  {label:"Day B: Shoulders + Back/Biceps",exercises:["DB Overhead Press","DB Rear Delt Raise","Pull-ups (Bar)","One-Arm DB Row","Ring Rows","EZ Bar Curl","DB Hammer Curl"]},
-  {label:"Day C: Shoulders + Legs/Core",exercises:["DB Overhead Press","DB Lateral Raise","DB RDL","Goblet Squat","Bulgarian Split Squat","Hanging Leg Raise (Bar)","Core (Plank / Ring Fallout)"]}
-];
-const DEFAULT_PROGRAM_GYM=[
-  {label:"Day A: Shoulders + Chest/Triceps",exercises:["Barbell Overhead Press","Cable Lateral Raise","Incline Barbell Bench Press","Barbell Bench Press","Cable Triceps Pushdown","Machine Chest Fly"]},
-  {label:"Day B: Shoulders + Back/Biceps",exercises:["Barbell Overhead Press","Rear Delt Machine Fly","Lat Pulldown","Barbell Row","Seated Cable Row","EZ Bar Curl","Incline DB Curl"]},
-  {label:"Day C: Shoulders + Legs/Core",exercises:["Barbell Overhead Press","DB Lateral Raise","Back Squat","Romanian Deadlift","Leg Press","Lying Leg Curl","Cable Crunch"]}
-];
 const LIFT_MODE=(localStorage.getItem('lift_mode_v1')==='gym'?'gym':'home');
-const DEFAULT_PROGRAM=LIFT_MODE==='gym'?DEFAULT_PROGRAM_GYM:DEFAULT_PROGRAM_HOME;
+const DEFAULT_PROGRAM=LIFT_MODE==='gym'?CONFIG.defaultPrograms.gym:CONFIG.defaultPrograms.home;
 const loadProgram=()=>{
   const toExerciseObj=e=>{
     const name=typeof e==='string'?e:(e&&typeof e.name==='string'?e.name:'');
@@ -456,11 +484,26 @@ const loadProgram=()=>{
 };
 const saveProgram=p=>localStorage.setItem('lift_program_v2',JSON.stringify(p));
 let PROGRAM=loadProgram();
-const REST_SECS=90;
+const REST_SECS=CONFIG.restSecs;
+const cloneDefaultExercises=()=>CONFIG.defaultExercises.map(e=>({...e}));
+const cloneDefaultProgram=mode=>(CONFIG.defaultPrograms[mode]||CONFIG.defaultPrograms.home).map(day=>({
+  label:day.label,
+  exercises:day.exercises.map(name=>({name,sets:3,reps:8}))
+}));
 const loadLog=()=>{try{return JSON.parse(localStorage.getItem('lift_log_v1')||'[]')}catch{return[]}};
 const saveLog=l=>localStorage.setItem('lift_log_v1',JSON.stringify(l));
 const loadPRs=()=>{try{return JSON.parse(localStorage.getItem('lift_pr_v1')||'{}')}catch{return{}}};
 const savePRs=p=>localStorage.setItem('lift_pr_v1',JSON.stringify(p));
+const BACKUP_KEYS=[
+  'lift_exercises_v1',
+  'lift_program_v2',
+  'lift_custom_programs_v1',
+  'lift_log_v1',
+  'lift_pr_v1',
+  'lift_session_v1',
+  'lift_mode_v1'
+];
+const BACKUP_VERSION=1;
 const loadCustomPrograms=()=>{
   const toExerciseObj=e=>{
     const name=typeof e==='string'?e:(e&&typeof e.name==='string'?e.name:'');
@@ -485,6 +528,7 @@ const saveCustomPrograms=p=>localStorage.setItem('lift_custom_programs_v1',JSON.
 let wlog=loadLog(),prs=loadPRs(),customPrograms=loadCustomPrograms();
 let currentDay=null,activeIdx=0,wsets=[],currentCustomProgram=null,isFreeWorkout=false,inFreePicker=false;
 let timerIv=null,elapsed=0,restIv=null,restLeft=0;
+let libraryQuery='',freeExerciseQuery='';
 const fmtTime=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 const fmtDate=iso=>new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 const todayStr=()=>new Date().toISOString().slice(0,10);
@@ -708,6 +752,79 @@ function exportCSV(){
   const a=document.createElement('a');a.href=url;a.download='lift-log-'+todayStr()+'.csv';a.click();URL.revokeObjectURL(url);
 }
 
+function exportBackup(){
+  const data={};
+  BACKUP_KEYS.forEach(key=>{
+    const value=localStorage.getItem(key);
+    if(value!==null)data[key]=value;
+  });
+  const payload={
+    version:BACKUP_VERSION,
+    exportedAt:new Date().toISOString(),
+    data
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='lift-backup-'+todayStr()+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function triggerImportBackup(){
+  const input=document.getElementById('backup-file-input');
+  input.value='';
+  input.click();
+}
+
+function importBackup(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const payload=JSON.parse(String(reader.result||''));
+      if(!payload||typeof payload!=='object'||payload.version!==BACKUP_VERSION||!payload.data||typeof payload.data!=='object'){
+        throw new Error('Invalid backup file format');
+      }
+      const hasKnownKey=BACKUP_KEYS.some(key=>Object.prototype.hasOwnProperty.call(payload.data,key));
+      if(!hasKnownKey)throw new Error('Backup file does not contain app data');
+      if(!confirm('Restore backup and replace current app data? This cannot be undone.'))return;
+      BACKUP_KEYS.forEach(key=>localStorage.removeItem(key));
+      Object.entries(payload.data).forEach(([key,value])=>{
+        if(BACKUP_KEYS.includes(key)&&typeof value==='string')localStorage.setItem(key,value);
+      });
+      EXERCISES=loadExercises();
+      PROGRAM=loadProgram();
+      wlog=loadLog();
+      prs=loadPRs();
+      customPrograms=loadCustomPrograms();
+      clearInterval(timerIv);
+      stopRest();
+      currentDay=null;
+      activeIdx=0;
+      wsets=[];
+      currentCustomProgram=null;
+      isFreeWorkout=false;
+      inFreePicker=false;
+      elapsed=0;
+      document.getElementById('w-timer').textContent='00:00';
+      alert('Backup restored.');
+      goHome();
+    }catch(err){
+      alert(err&&err.message?err.message:'Could not restore backup.');
+    }finally{
+      event.target.value='';
+    }
+  };
+  reader.onerror=()=>{
+    alert('Could not read backup file.');
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
 let editingDayIdx=null;
 function editDay(idx){
   editingDayIdx=idx;
@@ -810,6 +927,15 @@ function renderPrograms(){
         </div>
       </div>
     </div>`).join('');
+}
+
+function resetDefaultProgram(){
+  const mode=LIFT_MODE==='gym'?'gym':'home';
+  if(!confirm(`Reset built-in ${mode} program to the defaults from this version of the app? Your workout log and custom programs will be kept.`))return;
+  PROGRAM=cloneDefaultProgram(mode);
+  saveProgram(PROGRAM);
+  renderPrograms();
+  renderHome();
 }
 
 function createNewProgram(){
@@ -1005,13 +1131,23 @@ function showFreeExPanel(){
   document.getElementById('w-progress').innerHTML=currentDay.exercises.map(()=>`<div class="prog-dot done"></div>`).join('')+'<div class="prog-dot current"></div>';
   document.getElementById('w-stats').innerHTML='';
   stopRest();
-  document.getElementById('free-ex-list').innerHTML=EXERCISES.map(ex=>`<div class="add-ex-item"><span class="add-ex-name">${ex.name}</span><button class="btn btn-primary btn-sm" onclick="freePickExercise('${ex.name.replace(/'/g,"\\'")}')">+ Add</button></div>`).join('');
+  const search=document.getElementById('free-ex-search');
+  if(search)search.value=freeExerciseQuery;
+  renderFreeExList();
 }
 
 function hideFreeExPanel(){
   inFreePicker=false;
   document.getElementById('free-ex-panel').style.display='none';
   document.getElementById('w-scroll').style.display='';
+}
+
+function renderFreeExList(){
+  const query=freeExerciseQuery.trim().toLowerCase();
+  const filtered=EXERCISES.filter(ex=>!query||ex.name.toLowerCase().includes(query));
+  document.getElementById('free-ex-list').innerHTML=filtered.length
+    ? filtered.map(ex=>`<div class="add-ex-item"><span class="add-ex-name">${ex.name}</span><button class="btn btn-primary btn-sm" onclick="freePickExercise('${ex.name.replace(/'/g,"\\'")}')">+ Add</button></div>`).join('')
+    : '<div class="empty" style="padding:24px">No exercises found</div>';
 }
 
 function freePickExercise(name){
@@ -1053,7 +1189,17 @@ let editingExIdx=null;
 
 function renderLibrary(){
   const list=document.getElementById('library-list');
-  list.innerHTML=EXERCISES.map((ex,idx)=>{
+  const search=document.getElementById('library-search');
+  if(search&&search.value!==libraryQuery)search.value=libraryQuery;
+  const query=libraryQuery.trim().toLowerCase();
+  const filtered=EXERCISES
+    .map((ex,idx)=>({ex,idx}))
+    .filter(({ex})=>!query||ex.name.toLowerCase().includes(query));
+  if(!filtered.length){
+    list.innerHTML='<div class="empty" style="padding:24px 0">No exercises found.</div>';
+    return;
+  }
+  list.innerHTML=filtered.map(({ex,idx})=>{
     const isCustom=!DEFAULT_EXERCISES.find(d=>d.name===ex.name);
     return`<div class="lib-ex-card">
       <div class="lib-ex-header">
@@ -1076,6 +1222,13 @@ function renderLibrary(){
       ${isCustom?`<div class="lib-actions"><button class="btn btn-sm btn-secondary" onclick="editExerciseScreen(${idx})">Rename</button><button class="btn btn-sm btn-secondary" style="color:#e55" onclick="deleteExerciseFromLib(${idx})">Delete</button></div>`:''}
     </div>`;
   }).join('');
+}
+
+function resetDefaultExercises(){
+  if(!confirm('Reset the exercise library to the built-in defaults from this version of the app? Your workout log will be kept.'))return;
+  EXERCISES=cloneDefaultExercises();
+  saveExercises(EXERCISES);
+  renderLibrary();
 }
 
 function updateExField(idx,field,value){
